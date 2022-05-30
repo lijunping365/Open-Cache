@@ -7,6 +7,8 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.saucesubfresh.entity.UserEntity;
 import com.saucesubfresh.service.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "user", key = "#root.methodName")
+    @CacheEvict(cacheNames = "user", key = "#root.methodName")
     public UserEntity loadUser(Integer id) {
 
         // 查找一个缓存元素， 没有查找到的时候返回null
