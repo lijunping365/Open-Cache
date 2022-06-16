@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cache-client</artifactId>
+    <artifactId>cache-sample</artifactId>
 
     <dependencies>
         <dependency>
@@ -94,7 +94,7 @@
                 </executions>
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
-                    <mainClass>com.saucesubfresh.CacheClientApplication</mainClass>
+                    <mainClass>com.saucesubfresh.cache.CacheSampleApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
