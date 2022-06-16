@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @author lijunping on 2022/4/11
  */
 @Data
-@TableName("open_Cache_report")
+@TableName("open_cache_report")
 public class OpenCacheReportDO {
 
     /**

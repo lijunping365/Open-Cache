@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * @date 2021-09-06 10:10:03
  */
 @Data
-@TableName("open_Cache_log")
+@TableName("open_cache_log")
 public class OpenCacheLogDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 

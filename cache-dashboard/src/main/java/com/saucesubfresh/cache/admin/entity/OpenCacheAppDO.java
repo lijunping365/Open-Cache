@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @author lijunping on 2022/6/10
  */
 @Data
-@TableName("open_Cache_app")
+@TableName("open_cache_app")
 public class OpenCacheAppDO implements Serializable {
     private static final long serialVersionUID = 598192183560573801L;
 
