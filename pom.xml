@@ -13,7 +13,7 @@
         <module>cache-dependencies</module>
         <module>cache-common</module>
         <module>cache-dashboard</module>
-        <module>cache-client</module>
+        <module>cache-sample</module>
     </modules>
 
     <properties>
