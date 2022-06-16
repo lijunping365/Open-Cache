@@ -12,7 +12,7 @@
     <modules>
         <module>cache-dependencies</module>
         <module>cache-common</module>
-        <module>cache-admin</module>
+        <module>cache-dashboard</module>
         <module>cache-client</module>
     </modules>
 
