@@ -151,7 +151,7 @@
                 </executions>
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
-                    <mainClass>com.saucesubfresh.CacheAdminApplication</mainClass>
+                    <mainClass>com.saucesubfresh.cache.CacheDashboardApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

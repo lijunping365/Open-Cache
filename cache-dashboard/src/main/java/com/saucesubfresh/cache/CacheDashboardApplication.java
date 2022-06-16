@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableSecurity
 @EnableOpenRpcServer
 @SpringBootApplication
-public class CacheAdminApplication {
+public class CacheDashboardApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CacheAdminApplication.class, args);
+        SpringApplication.run(CacheDashboardApplication.class, args);
     }
 }
