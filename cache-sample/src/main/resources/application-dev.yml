@@ -1,0 +1,27 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+com:
+  saucesubfresh:
+    rpc:
+      client:
+        server-address: 127.0.0.1
+        server-port: 5200
+        client-name: cache-client-services
+        client-port: 5201
+        client-address: 127.0.0.1
+    cache:
+      namespace: cache-sample-one
+
+
+

@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: cache-sample
+
+
+logging:
+  level:
+    com.saucesubfresh: INFO
+
+debug: true

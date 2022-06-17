@@ -1,5 +1,6 @@
 package com.saucesubfresh.cache.common.domain;
 
+import com.saucesubfresh.cache.common.enums.CommandType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,7 +15,13 @@ public class MessageBody implements Serializable {
     /**
      * The name of CacheHandler
      */
-    private String namespace;
+    private String cacheName;
+
+    /**
+     * 命令
+     */
+    private CommandType command;
+
     /**
      * The params, json 字符串
      */
