@@ -10,10 +10,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisCaffeineCache extends AbstractClusterCache {
 
     private final String cacheName;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
-    public RedisCaffeineCache(String cacheName, RedisTemplate<Object, Object> redisTemplate) {
+    public RedisCaffeineCache(String cacheName, RedisTemplate<String, Object> redisTemplate) {
         this.cacheName = cacheName;
         this.redisTemplate = redisTemplate;
     }

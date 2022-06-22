@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
  * @author: 李俊平
  * @Date: 2022-06-18 23:13
  */
-@Component
+//@Component
 public class RedisCaffeineCacheManager extends AbstractCacheManager {
 
     private static final String SAM = ":";
     private final CacheProperties properties;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public RedisCaffeineCacheManager(CacheProperties properties, ConfigFactory configFactory, RedisTemplate<Object, Object> redisTemplate) {
+    public RedisCaffeineCacheManager(CacheProperties properties, ConfigFactory configFactory, RedisTemplate<String, Object> redisTemplate) {
         super(configFactory);
         this.properties = properties;
         this.redisTemplate = redisTemplate;
@@ -35,6 +35,5 @@ public class RedisCaffeineCacheManager extends AbstractCacheManager {
     protected String generate(String namespace, String cacheName){
         return namespace + SAM + cacheName;
     }
-
 
 }

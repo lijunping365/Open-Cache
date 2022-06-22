@@ -12,4 +12,4 @@ logging:
   level:
     com.saucesubfresh: INFO
 
-debug: true
+#debug: true
