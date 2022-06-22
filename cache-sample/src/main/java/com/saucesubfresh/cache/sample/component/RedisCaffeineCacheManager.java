@@ -1,9 +1,9 @@
 package com.saucesubfresh.cache.sample.component;
 
 import com.saucesubfresh.starter.cache.core.ClusterCache;
-import com.saucesubfresh.starter.cache.core.ClusterCacheProvider;
+import com.saucesubfresh.starter.cache.factory.CacheConfig;
+import com.saucesubfresh.starter.cache.factory.ConfigFactory;
 import com.saucesubfresh.starter.cache.manager.AbstractCacheManager;
-import com.saucesubfresh.starter.cache.properties.CacheConfig;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -16,10 +16,12 @@ import org.springframework.stereotype.Component;
 public class RedisCaffeineCacheManager extends AbstractCacheManager {
 
     private static final String SAM = ":";
+    private final CacheProperties properties;
     private final RedisTemplate<Object, Object> redisTemplate;
 
-    public RedisCaffeineCacheManager(CacheProperties properties, RedisTemplate<Object, Object> redisTemplate) {
-        super(properties);
+    public RedisCaffeineCacheManager(CacheProperties properties, ConfigFactory configFactory, RedisTemplate<Object, Object> redisTemplate) {
+        super(configFactory);
+        this.properties = properties;
         this.redisTemplate = redisTemplate;
     }
 
@@ -33,4 +35,6 @@ public class RedisCaffeineCacheManager extends AbstractCacheManager {
     protected String generate(String namespace, String cacheName){
         return namespace + SAM + cacheName;
     }
+
+
 }

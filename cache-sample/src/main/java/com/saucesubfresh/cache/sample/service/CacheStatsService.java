@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.sample.service;
 
-import com.saucesubfresh.starter.cache.domain.CacheStatsInfo;
+
+import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
 
 import java.util.List;
 
