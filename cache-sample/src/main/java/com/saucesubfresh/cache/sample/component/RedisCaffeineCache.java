@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.sample.component;
 
 import com.saucesubfresh.starter.cache.core.AbstractClusterCache;
+import com.saucesubfresh.starter.cache.stats.ConcurrentStatsCounter;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
@@ -14,6 +15,7 @@ public class RedisCaffeineCache extends AbstractClusterCache {
 
 
     public RedisCaffeineCache(String cacheName, RedisTemplate<String, Object> redisTemplate) {
+        super(new ConcurrentStatsCounter());
         this.cacheName = cacheName;
         this.redisTemplate = redisTemplate;
     }

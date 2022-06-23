@@ -28,6 +28,11 @@ public class CacheStatsInfo implements Serializable {
     private long requestCount;
 
     /**
+     * 总命中总数
+     */
+    private long hitCount;
+
+    /**
      * 总未命中总数
      */
     private long missCount;
@@ -38,7 +43,7 @@ public class CacheStatsInfo implements Serializable {
     private double hitRate;
 
     /**
-     * 总的请求时间
+     * 未命中率
      */
-    private long totalLoadTime;
+    private double missRate;
 }

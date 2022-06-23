@@ -16,9 +16,9 @@ com:
     rpc:
       client:
         server-address: 127.0.0.1
-        server-port: 5200
+        server-port: 5600
         client-name: cache-client-services
-        client-port: 5201
+        client-port: 5601
         client-address: 127.0.0.1
     cache:
       namespace: cache-sample-one
