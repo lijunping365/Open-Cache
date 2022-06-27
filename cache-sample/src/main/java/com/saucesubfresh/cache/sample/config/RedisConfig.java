@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.saucesubfresh.starter.cache.executor.CacheExecutor;
+import com.saucesubfresh.starter.cache.manager.RedisCaffeineCacheManager;
+import com.saucesubfresh.starter.cache.message.CacheMessageListener;
+import com.saucesubfresh.starter.cache.message.RedisCacheMessageListener;
+import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -19,6 +24,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -87,5 +94,18 @@ public class RedisConfig {
         config.setCodec(new JsonJacksonCodec());
 
         return Redisson.create(config);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer cacheMessageListenerContainer(CacheExecutor cacheExecutor,
+                                                                       CacheProperties cacheProperties,
+                                                                       RedisTemplate<String, Object> redisTemplate,
+                                                                       LettuceConnectionFactory connectionFactory) {
+
+        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(connectionFactory);
+        RedisCacheMessageListener cacheMessageListener = new RedisCacheMessageListener(cacheExecutor,cacheProperties, redisTemplate);
+        redisMessageListenerContainer.addMessageListener(cacheMessageListener, new ChannelTopic(cacheProperties.getNamespace()));
+        return redisMessageListenerContainer;
     }
 }
