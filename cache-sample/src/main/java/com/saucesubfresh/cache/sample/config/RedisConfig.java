@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -96,16 +97,15 @@ public class RedisConfig {
         return Redisson.create(config);
     }
 
-    @Bean
-    public RedisMessageListenerContainer cacheMessageListenerContainer(CacheExecutor cacheExecutor,
-                                                                       CacheProperties cacheProperties,
-                                                                       RedisTemplate<String, Object> redisTemplate,
-                                                                       LettuceConnectionFactory connectionFactory) {
-
-        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
-        redisMessageListenerContainer.setConnectionFactory(connectionFactory);
-        RedisCacheMessageListener cacheMessageListener = new RedisCacheMessageListener(cacheExecutor,cacheProperties, redisTemplate);
-        redisMessageListenerContainer.addMessageListener(cacheMessageListener, new ChannelTopic(cacheProperties.getNamespace()));
-        return redisMessageListenerContainer;
-    }
+//    @Bean
+//    public RedisMessageListenerContainer cacheMessageListenerContainer(CacheProperties cacheProperties,
+//                                                                       CacheMessageListener cacheMessageListener,
+//                                                                       LettuceConnectionFactory connectionFactory) {
+//
+//        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+//        redisMessageListenerContainer.setConnectionFactory(connectionFactory);
+//        MessageListener messageListener = (MessageListener) cacheMessageListener;
+//        redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(cacheProperties.getNamespace()));
+//        return redisMessageListenerContainer;
+//    }
 }
