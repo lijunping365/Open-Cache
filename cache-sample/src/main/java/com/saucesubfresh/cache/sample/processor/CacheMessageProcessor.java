@@ -1,7 +1,6 @@
 package com.saucesubfresh.cache.sample.processor;
 
 import com.saucesubfresh.cache.common.domain.MessageBody;
-import com.saucesubfresh.cache.common.enums.CommandType;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
 import com.saucesubfresh.rpc.client.process.MessageProcess;
 import com.saucesubfresh.rpc.core.Message;
@@ -27,17 +26,7 @@ public class CacheMessageProcessor implements MessageProcess{
     public byte[] process(Message message) {
         final byte[] body = message.getBody();
         MessageBody messageBody = SerializationUtils.deserialize(body, MessageBody.class);
-
-        String cacheName = messageBody.getCacheName();
-        CommandType command = messageBody.getCommand();
-        switch (command){
-            case PRELOAD:
-                cacheExecutor.preloadCache(cacheName);
-                break;
-            case CLEAR:
-                cacheExecutor.clearCache(cacheName);
-                break;
-        }
+        cacheExecutor.execute(messageBody);
 
         return null;
     }
