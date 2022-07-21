@@ -1,4 +1,4 @@
-package com.saucesubfresh.cache.admin.component.mybatis;
+package com.saucesubfresh.cache.admin.component;
 
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import lombok.extern.slf4j.Slf4j;

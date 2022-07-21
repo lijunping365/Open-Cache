@@ -1,6 +1,6 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
-import com.saucesubfresh.cache.admin.common.enums.OpenCacheReportEnum;
+import com.saucesubfresh.cache.admin.common.OpenCacheReportEnum;
 import com.saucesubfresh.cache.admin.dto.resp.OpenCacheReportRespDTO;
 import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticNumberRespDTO;
 import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticReportRespDTO;

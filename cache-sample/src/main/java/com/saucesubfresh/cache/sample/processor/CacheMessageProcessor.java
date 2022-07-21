@@ -26,7 +26,7 @@ public class CacheMessageProcessor implements MessageProcess{
     public byte[] process(Message message) {
         final byte[] body = message.getBody();
         MessageBody messageBody = SerializationUtils.deserialize(body, MessageBody.class);
-        cacheExecutor.execute(messageBody);
+        //cacheExecutor.execute(messageBody);
 
         return null;
     }

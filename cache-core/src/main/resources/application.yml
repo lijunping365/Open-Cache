@@ -1,0 +1,66 @@
+server:
+  port: 8010
+  servlet:
+    context-path: /openCache
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: cache-dashboard
+  main:
+    allow-bean-definition-overriding: true # SpringBoot 2.1需要设置
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  type-enums-package: com.saucesubfresh.cache.admin.enums*;com.saucesubfresh.cache.common.enums*
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.saucesubfresh: INFO
+
+# 报表任务
+report-cron-express: "0 59 23 * * ? *"
+# 清除日志任务（每周五）
+clear-cron-express: "0 0 12 ? * 6"
+# 报警任务（除去周六日，每天早上9点触发）
+alarm-cron-express: "0 0 9 ? * 2,3,4,5,6"
+# 清除多少天前的日志
+clear-interval: 7
+
+# 报警模板 标题（任务名称）:时间，内容
+alarm-template: "T%s:T%s,Cause by:%s"
+# 夜间开始时间（18：30）
+night-pending-begin-time: 1830
+# 夜间结束时间（9：00）
+night-pending-end-time: 900
+
+com:
+  saucesubfresh:
+    rpc:
+      server:
+        server-port: 5200
+    captcha:
+      image:
+        length: 4 #图形验证码的位数为6，将覆盖默认配置中的4
+        width: 200 #图形验证码的宽度为100，将覆盖默认配置中的67，但由于请求中设置的宽度为200，所以真正的宽度将为200
+        height: 60
+      scan:
+        width: 300 #二维码宽度
+        height: 300 #二维码高度
+        margin: 1 #二维码外边距，0到4
+      math:
+        width: 200 #图形验证码的宽度为100，将覆盖默认配置中的67，但由于请求中设置的宽度为200，所以真正的宽度将为200
+        height: 60
+    security:
+      ignore-paths:
+        - "/captcha/**"
+        - "/login/**"
+    alarm:
+      # 这里的 {xxxxxx} 替换成你的钉钉机器人的 secret
+      secret: xxxxxx
+      # 这里 {xxxxxxxx} 替换成你的钉钉机器人的 access_token
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxx
