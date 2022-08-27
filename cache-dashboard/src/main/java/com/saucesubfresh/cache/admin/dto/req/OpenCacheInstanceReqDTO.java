@@ -1,6 +1,6 @@
 package com.saucesubfresh.cache.admin.dto.req;
 
-import com.saucesubfresh.rpc.core.enums.ClientStatus;
+import com.saucesubfresh.rpc.core.enums.Status;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ public class OpenCacheInstanceReqDTO implements Serializable {
     /**
      * 在线状态
      */
-    private ClientStatus status;
+    private Status status;
     /**
      * 权重
      */

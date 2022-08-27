@@ -2,8 +2,8 @@ package com.saucesubfresh.cache.sample.processor;
 
 import com.saucesubfresh.cache.common.domain.MessageBody;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
-import com.saucesubfresh.rpc.client.process.MessageProcess;
 import com.saucesubfresh.rpc.core.Message;
+import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.executor.CacheExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,14 +13,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class CacheMessageProcessor implements MessageProcess{
+public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheExecutor cacheExecutor;
 
     public CacheMessageProcessor(CacheExecutor cacheExecutor) {
         this.cacheExecutor = cacheExecutor;
     }
-
 
     @Override
     public byte[] process(Message message) {

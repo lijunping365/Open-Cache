@@ -7,9 +7,9 @@ import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
 import com.saucesubfresh.cache.admin.service.OpenCacheInstanceService;
 import com.saucesubfresh.cache.common.time.LocalDateTimeUtil;
 import com.saucesubfresh.cache.common.vo.PageResult;
-import com.saucesubfresh.rpc.core.information.ClientInformation;
-import com.saucesubfresh.rpc.server.manager.InstanceManager;
-import com.saucesubfresh.rpc.server.store.InstanceStore;
+import com.saucesubfresh.rpc.client.manager.InstanceManager;
+import com.saucesubfresh.rpc.client.store.InstanceStore;
+import com.saucesubfresh.rpc.core.information.ServerInformation;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -29,7 +29,9 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
     private final InstanceManager instanceManager;
     private final OpenCacheAppService openCacheAppService;
 
-    public OpenCacheInstanceServiceImpl(InstanceStore instanceStore, InstanceManager instanceManager, OpenCacheAppService openCacheAppService) {
+    public OpenCacheInstanceServiceImpl(InstanceStore instanceStore,
+                                        InstanceManager instanceManager,
+                                        OpenCacheAppService openCacheAppService) {
         this.instanceStore = instanceStore;
         this.instanceManager = instanceManager;
         this.openCacheAppService = openCacheAppService;
@@ -38,7 +40,7 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
     @Override
     public PageResult<OpenCacheInstanceRespDTO> selectPage(OpenCacheInstanceReqDTO instanceReqDTO) {
         final OpenCacheAppRespDTO openCacheApp = openCacheAppService.getById(instanceReqDTO.getAppId());
-        List<ClientInformation> instances = instanceStore.getByNamespace(openCacheApp.getAppName());
+        List<ServerInformation> instances = instanceStore.getByNamespace(openCacheApp.getAppName());
         List<OpenCacheInstanceRespDTO> CacheInstance = convertList(instances);
         return PageResult.<OpenCacheInstanceRespDTO>newBuilder()
                 .records(CacheInstance)
@@ -50,22 +52,22 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
     @Override
     public Boolean offlineClient(String clientId) {
-        return instanceManager.offlineClient(clientId);
+        return instanceManager.offlineServer(clientId);
     }
 
     @Override
     public Boolean onlineClient(String clientId) {
-        return instanceManager.onlineClient(clientId);
+        return instanceManager.offlineServer(clientId);
     }
 
-    private List<OpenCacheInstanceRespDTO> convertList(List<ClientInformation> instances) {
+    private List<OpenCacheInstanceRespDTO> convertList(List<ServerInformation> instances) {
         if (CollectionUtils.isEmpty(instances)){
             return new ArrayList<>();
         }
 
         return instances.stream().map(e->{
             OpenCacheInstanceRespDTO instance = new OpenCacheInstanceRespDTO();
-            instance.setClientId(e.getClientId());
+            instance.setClientId(e.getServerId());
             LocalDateTime localDateTime = LocalDateTimeUtil.toLocalDateTime(e.getOnlineTime());
             instance.setOnlineTime(localDateTime);
             instance.setStatus(e.getStatus());

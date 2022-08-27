@@ -13,7 +13,7 @@ import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
 import com.saucesubfresh.cache.common.vo.PageResult;
-import com.saucesubfresh.rpc.server.discovery.ServiceDiscovery;
+import com.saucesubfresh.rpc.client.discovery.ServiceDiscovery;
 import com.saucesubfresh.starter.security.context.UserSecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
