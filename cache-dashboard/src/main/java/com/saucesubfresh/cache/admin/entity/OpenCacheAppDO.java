@@ -29,11 +29,20 @@ public class OpenCacheAppDO implements Serializable {
      */
     private String appDesc;
     /**
-     * 任务创建人
+     * 应用创建时间
+     */
+    private LocalDateTime createTime;
+    /**
+     * 应用修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 应用创建人
      */
     private Long createUser;
     /**
-     * 任务日志创建时间
+     * 应用修改人
      */
-    private LocalDateTime createTime;
+    private Long updateUser;
+
 }

@@ -22,8 +22,21 @@ public class OpenCacheAppCreateDTO implements Serializable {
 
     private String appDesc;
 
-    private Long createUser;
-
+    /**
+     * 应用创建时间
+     */
     private LocalDateTime createTime;
+    /**
+     * 应用修改时间
+     */
+    private LocalDateTime updateTime;
+    /**
+     * 应用创建人
+     */
+    private Long createUser;
+    /**
+     * 应用修改人
+     */
+    private Long updateUser;
 
 }

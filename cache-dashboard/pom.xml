@@ -40,11 +40,6 @@
 
         <dependency>
             <groupId>com.saucesubfresh</groupId>
-            <artifactId>open-starter-schedule</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.saucesubfresh</groupId>
             <artifactId>open-starter-alarm</artifactId>
         </dependency>
 

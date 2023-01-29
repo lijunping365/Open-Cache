@@ -2,15 +2,12 @@ package com.saucesubfresh.cache.admin.config;
 
 import com.saucesubfresh.cache.common.exception.BaseCheckedException;
 import com.saucesubfresh.cache.common.exception.BaseException;
-import com.saucesubfresh.cache.common.exception.ControllerException;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.cache.common.vo.ResultEnum;
-import com.saucesubfresh.starter.captcha.exception.ValidateCodeException;
-import com.saucesubfresh.starter.oauth.exception.AuthenticationException;
+import com.saucesubfresh.starter.security.exception.AccessDeniedException;
 import com.saucesubfresh.starter.security.exception.SecurityException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -24,12 +21,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,8 +35,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @Value("${spring.application.name}")
-  private String applicationName;
+  /**
+   * 处理 SpringMVC 请求方法不正确
+   * <p>
+   * 例如说，A 接口的方法为 GET 方式，结果请求方法为 POST 方式，导致不匹配
+   */
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public Result<Object> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
+    log.warn("[httpRequestMethodNotSupportedExceptionHandler]", ex);
+    return Result.failed(HttpStatus.BAD_REQUEST.value(), String.format("请求方法不正确:%s", ex.getMessage()));
+  }
 
   @ExceptionHandler({IllegalArgumentException.class})
   public Result<Object> badRequest(IllegalArgumentException ex) {
@@ -90,13 +92,13 @@ public class GlobalExceptionHandler {
     List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
 
     Map<String, String> errors = allErrors.stream()
-      .map(error -> Collections.singletonMap(((FieldError) error).getField(), error.getDefaultMessage()))
-      .flatMap(stringStringMap -> stringStringMap.entrySet().stream())
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .map(error -> Collections.singletonMap(((FieldError) error).getField(), error.getDefaultMessage()))
+            .flatMap(stringStringMap -> stringStringMap.entrySet().stream())
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     String errorMsg = allErrors.stream()
-      .map(error -> ((FieldError) error).getField() + ":" + error.getDefaultMessage())
-      .collect(Collectors.joining(";"));
+            .map(error -> ((FieldError) error).getField() + ":" + error.getDefaultMessage())
+            .collect(Collectors.joining(";"));
 
     return Result.failed(errors, HttpStatus.BAD_REQUEST.value(), String.format("请求参数不正确:%s", errorMsg));
   }
@@ -110,46 +112,15 @@ public class GlobalExceptionHandler {
     List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 
     Map<String, String> errors = fieldErrors.stream()
-      .map(fieldError -> Collections.singletonMap(fieldError.getField(), fieldError.getDefaultMessage()))
-      .flatMap(stringStringMap -> stringStringMap.entrySet().stream())
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .map(fieldError -> Collections.singletonMap(fieldError.getField(), fieldError.getDefaultMessage()))
+            .flatMap(stringStringMap -> stringStringMap.entrySet().stream())
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     String msg = fieldErrors.stream()
-      .map(fieldError -> fieldError.getField() + ":" + fieldError.getDefaultMessage())
-      .collect(Collectors.joining(";"));
+            .map(fieldError -> fieldError.getField() + ":" + fieldError.getDefaultMessage())
+            .collect(Collectors.joining(";"));
 
     return Result.failed(errors, HttpStatus.BAD_REQUEST.value(), String.format("请求参数不正确:%s", msg));
-  }
-
-  /**
-   * 处理 Validator 校验不通过产生的异常
-   */
-  @ExceptionHandler(ConstraintViolationException.class)
-  public Result<Object> validate(ConstraintViolationException ex) {
-    log.warn("[constraintViolationExceptionHandler]", ex);
-    Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
-
-    String msg = constraintViolations.stream()
-      .map(constraintViolation -> constraintViolation.getPropertyPath().toString() + ":" + constraintViolation.getInvalidValue() + ":" + constraintViolation.getMessage())
-      .collect(Collectors.joining(";"));
-
-    Map<Object, String> collect = constraintViolations.stream()
-      .map(constraintViolation -> Collections.singletonMap(constraintViolation.getInvalidValue(), constraintViolation.getMessage()))
-      .flatMap(objectStringMap -> objectStringMap.entrySet().stream())
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-    return Result.failed(collect, HttpStatus.BAD_REQUEST.value(), String.format("请求参数不正确:%s", msg));
-  }
-
-  /**
-   * 处理 SpringMVC 请求方法不正确
-   * <p>
-   * 例如说，A 接口的方法为 GET 方式，结果请求方法为 POST 方式，导致不匹配
-   */
-  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  public Result<Object> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
-    log.warn("[httpRequestMethodNotSupportedExceptionHandler]", ex);
-    return Result.failed(HttpStatus.BAD_REQUEST.value(), String.format("请求方法不正确:%s", ex.getMessage()));
   }
 
   /**
@@ -159,17 +130,6 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler({ServiceException.class})
   public Result<Object> serviceException(ServiceException ex) {
-    log.warn("[serviceExceptionHandler]", ex);
-    return Result.failed(ex.getCode(), ex.getMessage());
-  }
-
-  /**
-   * 处理业务异常 ControllerException
-   * <p>
-   * 例如说，商品库存不足，用户手机号已存在。
-   */
-  @ExceptionHandler({ControllerException.class})
-  public Result<Object> controllerException(ControllerException ex) {
     log.warn("[serviceExceptionHandler]", ex);
     return Result.failed(ex.getCode(), ex.getMessage());
   }
@@ -195,19 +155,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({SecurityException.class})
   public Result<Object> securityException(SecurityException ex) {
     log.warn("[securityException]", ex);
-    return Result.failed(ex.getCode(), ex.getMessage());
-  }
-
-  @ExceptionHandler({ValidateCodeException.class})
-  public Result<Object> validateCodeException(ValidateCodeException ex) {
-    log.warn("[validateCodeException]", ex);
-    return Result.failed(ResultEnum.ERROR.getCode(), ex.getMessage());
-  }
-
-  @ExceptionHandler({AuthenticationException.class})
-  public Result<Object> authenticationException(AuthenticationException ex) {
-    log.warn("[AuthenticationException]", ex);
-    return Result.failed(ex.getCode(), ex.getMessage());
+    if (ex instanceof AccessDeniedException){
+      return Result.failed(ResultEnum.FORBIDDEN.getMsg());
+    }
+    return Result.failed(ResultEnum.UNAUTHORIZED.getCode(), ResultEnum.UNAUTHORIZED.getMsg());
   }
 
   @ExceptionHandler({RuntimeException.class})

@@ -8,11 +8,15 @@
 
 Dashboard 通过 MQ 广播同步缓存消息给应用的各个节点
 
-2. 应用缓存指标数据上报给 Dashboard 使用 Netty
+2. 应用缓存指标数据上报给 Dashboard 使用 消息中间件
 
-应用节点充当 Netty 客户端，Dashboard 充当 Netty 服务端。
+内存缓存同步使用哪个 MQ 指标数据就使用哪个 MQ
 
-3. Dashboard 主动查询缓存节点的缓存指标数据
+3. Dashboard 主动查询缓存节点的缓存指标数据，查询缓存节点上有哪些 cacheName，以及操作缓存节点上的缓存数据
+
+这些都使用 Open-Light-Rpc
+
+
 
 
 
