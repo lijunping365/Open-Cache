@@ -5,6 +5,8 @@ import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.saucesubfresh.starter.cache.executor.CacheExecutor;
+import com.saucesubfresh.starter.cache.handler.CacheListenerErrorHandler;
+import com.saucesubfresh.starter.cache.handler.CacheProducerErrorHandler;
 import com.saucesubfresh.starter.cache.message.*;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,17 +32,20 @@ public class CacheConfiguration {
         return NacosFactory.createNamingService(properties);
     }
 
-//    @Bean
-//    public CacheMessageProducer cacheMessageProducer(CacheProperties properties,
-//                                                     RedisTemplate<String, Object> redisTemplate){
-//        return new RedisCacheMessageProducer(properties, redisTemplate);
-//    }
-//
-//    @Bean
-//    public CacheMessageListener cacheMessageListener(CacheExecutor cacheExecutor,
-//                                                     RedisTemplate<String, Object> redisTemplate){
-//        return new RedisCacheMessageListener(cacheExecutor, redisTemplate);
-//    }
+    @Bean
+    public CacheMessageProducer cacheMessageProducer(CacheProperties properties,
+                                                     CacheProducerErrorHandler errorHandler,
+                                                     RedisTemplate<String, Object> redisTemplate){
+        return new RedisCacheMessageProducer(properties, errorHandler, redisTemplate);
+    }
+
+    @Bean
+    public CacheMessageListener cacheMessageListener(CacheExecutor cacheExecutor,
+                                                     CacheProperties properties,
+                                                     CacheListenerErrorHandler errorHandler,
+                                                     RedisTemplate<String, Object> redisTemplate){
+        return new RedisCacheMessageListener(cacheExecutor, properties, errorHandler, redisTemplate);
+    }
 
 //    @Bean
 //    public CacheMessageProducer cacheMessageProducer(CacheProperties properties,

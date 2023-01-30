@@ -4,6 +4,7 @@ import com.saucesubfresh.cache.common.domain.CacheMessageBody;
 import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
+import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
@@ -14,14 +15,10 @@ import com.saucesubfresh.starter.cache.message.CacheCommand;
 import com.saucesubfresh.starter.cache.message.CacheMessage;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,42 +40,54 @@ public class CacheMessageProcessor implements MessageProcess {
     public byte[] process(Message message) {
         final byte[] body = message.getBody();
         CacheMessageBody messageBody = SerializationUtils.deserialize(body, CacheMessageBody.class);
+        Result<Object> result = doProcess(messageBody);
+        return SerializationUtils.serialize(result);
+    }
+
+    private Result<Object> doProcess(CacheMessageBody messageBody){
         CacheCommandEnum command = CacheCommandEnum.of(messageBody.getCommand());
         if (Objects.isNull(command)){
-            return "非法参数异常".getBytes(StandardCharsets.UTF_8);
+            return Result.failed("参数非法");
         }
-        if (command.isInner()){
-            switch (command){
-                case QUERY_CACHE_NAMES:
-                    return null;
-                case QUERY_CACHE_METRICS:
-                    return null;
+
+        if (!command.isInner()){
+            try {
+                cacheExecutor.execute(convert(messageBody));
+                return Result.succeed();
+            }catch (CacheExecuteException e){
+                log.error("缓存执行异常：{}", e.getMessage());
+                return Result.failed(e.getMessage());
             }
         }
-        try {
-            cacheExecutor.execute(convert(messageBody));
-        }catch (CacheExecuteException e){
-            log.error("缓存执行异常：{}", e.getMessage());
-            return null;
+
+        switch (command){
+            case QUERY_CACHE_NAMES:
+                Collection<String> cacheNames = cacheManager.getCacheNames();
+                return Result.succeed(cacheNames);
+            case QUERY_CACHE_METRICS:
+                List<CacheStatsInfo> cacheMetrics = getCacheMetrics(messageBody);
+                return Result.succeed(cacheMetrics);
+            default:
+                return Result.succeed();
+        }
+    }
+
+    private List<CacheStatsInfo> getCacheMetrics(CacheMessageBody messageBody){
+        List<String> cacheNames = new ArrayList<>();
+        String cacheName = messageBody.getCacheName();
+        if (StringUtils.isNotBlank(cacheName)){
+            cacheNames.add(cacheName);
+        }else {
+            cacheNames.addAll(cacheManager.getCacheNames());
         }
 
-
-        return null;
-    }
-
-    private void getCacheNames(){
-        final Collection<String> cacheNames = cacheManager.getCacheNames();
-    }
-
-    private List<CacheStatsInfo> getCacheMetrics(){
-        Collection<String> cacheNames = cacheManager.getCacheNames();
         if (CollectionUtils.isEmpty(cacheNames)){
             return Collections.emptyList();
         }
 
-        return cacheNames.stream().map(cacheName->{
+        return cacheNames.stream().map(e->{
             CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
-            cacheStatsInfo.setCacheName(cacheName);
+            cacheStatsInfo.setCacheName(e);
             final ClusterCache cache = cacheManager.getCache(cacheName);
             final CacheStats stats = cache.getStats();
             cacheStatsInfo.setHitCount(stats.getHitCount());

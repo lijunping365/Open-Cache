@@ -6,7 +6,6 @@ import com.saucesubfresh.cache.common.exception.ControllerException;
 import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.starter.captcha.core.image.ImageCodeGenerator;
 import com.saucesubfresh.starter.captcha.core.image.ImageValidateCode;
-import com.saucesubfresh.starter.captcha.core.math.MathImageCodeGenerator;
 import com.saucesubfresh.starter.captcha.core.sms.SmsCodeGenerator;
 import com.saucesubfresh.starter.captcha.core.sms.ValidateCode;
 import com.saucesubfresh.starter.captcha.exception.ValidateCodeException;
@@ -35,25 +34,10 @@ public class OpenCacheCaptchaController {
 
     private final ImageCodeGenerator imageCodeGenerator;
     private final SmsCodeGenerator smsCodeGenerator;
-    private final MathImageCodeGenerator mathImageCodeGenerator;
 
-    public OpenCacheCaptchaController(ImageCodeGenerator imageCodeGenerator, SmsCodeGenerator smsCodeGenerator, MathImageCodeGenerator mathImageCodeGenerator) {
+    public OpenCacheCaptchaController(ImageCodeGenerator imageCodeGenerator, SmsCodeGenerator smsCodeGenerator) {
         this.imageCodeGenerator = imageCodeGenerator;
         this.smsCodeGenerator = smsCodeGenerator;
-        this.mathImageCodeGenerator = mathImageCodeGenerator;
-    }
-
-    @PostMapping("/create/mathImage")
-    public Result<OpenCacheCaptchaRespDTO> createMathImageCode(@RequestBody @Valid OpenCacheCaptchaRequest request) {
-        CaptchaGenerateRequest captchaGenerateRequest = new CaptchaGenerateRequest();
-        captchaGenerateRequest.setRequestId(request.getDeviceId());
-        try {
-            ImageValidateCode imageValidateCode = mathImageCodeGenerator.create(captchaGenerateRequest);
-            return Result.succeed(convert(imageValidateCode));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new ControllerException(e.getMessage());
-        }
     }
 
     @PostMapping("/create/image")

@@ -22,15 +22,13 @@ spring:
 com:
   saucesubfresh:
     rpc:
-      client:
+      server:
         server-address: 127.0.0.1
-        server-port: 5600
-        client-name: cache-client-services
-        client-port: 5601
-        client-address: 127.0.0.1
+        server-port: 5200
+        server-name: open-job-services
     cache:
       namespace: cache-sample-one
-      instance-id: 127.0.0.1:8080
+      instance-id: 127.0.0.1:5200
 
 
 

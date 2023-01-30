@@ -13,14 +13,19 @@ public class CacheStatsInfo implements Serializable {
     private static final long serialVersionUID = -8492906785137983152L;
 
     /**
-     * 缓存名称
-     */
-    private String cacheName;
-
-    /**
      * 命名空间
      */
     private String namespace;
+
+    /**
+     * 缓存实例 id
+     */
+    private String instanceId;
+
+    /**
+     * 缓存名称
+     */
+    private String cacheName;
 
     /**
      * 总请求总数
