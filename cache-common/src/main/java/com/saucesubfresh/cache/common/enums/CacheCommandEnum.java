@@ -1,15 +1,13 @@
 package com.saucesubfresh.cache.common.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author lijunping on 2022/6/17
  */
-@Getter
-@AllArgsConstructor
 public enum CacheCommandEnum {
+
+    QUERY_CACHE_NAMES(true, "query_cache_names"), QUERY_CACHE_METRICS(true, "query_cache_names"),
 
     /**
      * Invalidate local cache entry across all LocalCachedMap instances on map entry change. Broadcasts map entry hash (16 bytes) to all instances.
@@ -33,6 +31,26 @@ public enum CacheCommandEnum {
     ;
 
     private final String value;
+
+    private final boolean inner;
+
+    CacheCommandEnum(String value) {
+        this.inner = false;
+        this.value = value;
+    }
+
+    CacheCommandEnum(boolean inner, String value) {
+        this.inner = inner;
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public boolean isInner() {
+        return inner;
+    }
 
     public static CacheCommandEnum of(String value){
         for (CacheCommandEnum cacheCommand : values()) {
