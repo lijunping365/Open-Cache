@@ -25,7 +25,7 @@ com:
       server:
         server-address: 127.0.0.1
         server-port: 5200
-        server-name: open-job-services
+        server-name: open-cache-app
     cache:
       namespace: cache-sample-one
       instance-id: 127.0.0.1:5200
