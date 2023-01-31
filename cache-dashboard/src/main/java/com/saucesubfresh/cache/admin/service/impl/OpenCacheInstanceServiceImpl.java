@@ -67,10 +67,10 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
         return instances.stream().map(e->{
             OpenCacheInstanceRespDTO instance = new OpenCacheInstanceRespDTO();
-            instance.setClientId(e.getServerId());
+            instance.setServerId(e.getServerId());
             LocalDateTime localDateTime = LocalDateTimeUtil.toLocalDateTime(e.getOnlineTime());
             instance.setOnlineTime(localDateTime);
-            instance.setStatus(e.getStatus());
+            instance.setStatus(e.getStatus().name());
             instance.setWeight(e.getWeight());
             return instance;
         }).collect(Collectors.toList());

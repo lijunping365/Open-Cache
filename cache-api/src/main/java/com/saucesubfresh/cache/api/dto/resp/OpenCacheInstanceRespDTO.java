@@ -1,8 +1,6 @@
 package com.saucesubfresh.cache.api.dto.resp;
 
-import com.saucesubfresh.rpc.core.enums.Status;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -17,7 +15,7 @@ public class OpenCacheInstanceRespDTO implements Serializable {
     /**
      * 客户端地址：端口
      */
-    private String clientId;
+    private String serverId;
     /**
      * 上线时间
      */
@@ -25,7 +23,7 @@ public class OpenCacheInstanceRespDTO implements Serializable {
     /**
      * 在线状态
      */
-    private Status status;
+    private String status;
     /**
      * 权重
      */
