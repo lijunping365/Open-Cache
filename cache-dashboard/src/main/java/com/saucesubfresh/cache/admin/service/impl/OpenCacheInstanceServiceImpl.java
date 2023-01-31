@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,25 +40,33 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
     @Override
     public PageResult<OpenCacheInstanceRespDTO> selectPage(OpenCacheInstanceReqDTO instanceReqDTO) {
-        final OpenCacheAppRespDTO openCacheApp = openCacheAppService.getById(instanceReqDTO.getAppId());
+        Long appId = instanceReqDTO.getAppId();
+        OpenCacheAppRespDTO openCacheApp = openCacheAppService.getById(appId);
         List<ServerInformation> instances = instanceStore.getByNamespace(openCacheApp.getAppName());
-        List<OpenCacheInstanceRespDTO> CacheInstance = convertList(instances);
-        return PageResult.<OpenCacheInstanceRespDTO>newBuilder()
-                .records(CacheInstance)
-                .total((long) CacheInstance.size())
-                .current(1L)
-                .pages((long) (CacheInstance.size() / 10))
-                .build();
+        List<OpenCacheInstanceRespDTO> cacheInstance = convertList(instances);
+        if (CollectionUtils.isEmpty(cacheInstance)){
+            return PageResult.<OpenCacheInstanceRespDTO>newBuilder().build();
+        }
+
+        cacheInstance.sort(Comparator.comparing(OpenCacheInstanceRespDTO::getOnlineTime).reversed());
+        return PageResult.build(cacheInstance, cacheInstance.size(), instanceReqDTO.getCurrent(), instanceReqDTO.getPageSize());
     }
 
     @Override
-    public Boolean offlineClient(String clientId) {
-        return instanceManager.offlineServer(clientId);
+    public Boolean offlineServer(String serverId) {
+        return instanceManager.offlineServer(serverId);
     }
 
     @Override
-    public Boolean onlineClient(String clientId) {
-        return instanceManager.offlineServer(clientId);
+    public Boolean onlineServer(String serverId) {
+        return instanceManager.offlineServer(serverId);
+    }
+
+    @Override
+    public List<OpenCacheInstanceRespDTO> getInstanceList(Long appId) {
+        OpenCacheAppRespDTO openJobApp = openCacheAppService.getById(appId);
+        List<ServerInformation> instances = instanceStore.getByNamespace(openJobApp.getAppName());
+        return convertList(instances);
     }
 
     private List<OpenCacheInstanceRespDTO> convertList(List<ServerInformation> instances) {
