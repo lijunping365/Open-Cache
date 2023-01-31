@@ -1,8 +1,8 @@
 package com.saucesubfresh.cache.admin.controller;
 
 
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticNumberRespDTO;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticReportRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticNumberRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticReportRespDTO;
 import com.saucesubfresh.cache.admin.service.OpenCacheStatisticService;
 import com.saucesubfresh.cache.common.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;

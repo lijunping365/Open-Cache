@@ -3,7 +3,7 @@ package com.saucesubfresh.cache.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.saucesubfresh.cache.admin.dto.req.OpenCacheLogReqDTO;
+import com.saucesubfresh.cache.api.dto.req.OpenCacheLogReqDTO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheLogDO;
 import com.saucesubfresh.cache.common.enums.CommonStatusEnum;
 import org.springframework.stereotype.Repository;

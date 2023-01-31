@@ -1,7 +1,7 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
 import com.saucesubfresh.cache.admin.convert.OpenCacheReportConvert;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheReportRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheReportRespDTO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheReportDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheLogMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheReportMapper;

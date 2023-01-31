@@ -1,9 +1,9 @@
 package com.saucesubfresh.cache.admin.controller;
 
-import com.saucesubfresh.cache.admin.dto.create.OpenCacheUserCreateDTO;
-import com.saucesubfresh.cache.admin.dto.req.OpenCacheUserReqDTO;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheUserRespDTO;
-import com.saucesubfresh.cache.admin.dto.update.OpenCacheUserUpdateDTO;
+import com.saucesubfresh.cache.api.dto.create.OpenCacheUserCreateDTO;
+import com.saucesubfresh.cache.api.dto.req.OpenCacheUserReqDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheUserRespDTO;
+import com.saucesubfresh.cache.api.dto.update.OpenCacheUserUpdateDTO;
 import com.saucesubfresh.cache.admin.service.OpenCacheUserService;
 import com.saucesubfresh.cache.common.vo.PageResult;
 import com.saucesubfresh.cache.common.vo.Result;

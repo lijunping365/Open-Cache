@@ -14,6 +14,7 @@
         <module>cache-common</module>
         <module>cache-dashboard</module>
         <module>cache-sample</module>
+        <module>cache-api</module>
     </modules>
 
     <properties>

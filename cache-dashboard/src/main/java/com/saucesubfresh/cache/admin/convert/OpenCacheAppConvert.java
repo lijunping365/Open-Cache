@@ -1,8 +1,8 @@
 package com.saucesubfresh.cache.admin.convert;
 
-import com.saucesubfresh.cache.admin.dto.create.OpenCacheAppCreateDTO;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheAppRespDTO;
-import com.saucesubfresh.cache.admin.dto.update.OpenCacheAppUpdateDTO;
+import com.saucesubfresh.cache.api.dto.create.OpenCacheAppCreateDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheAppRespDTO;
+import com.saucesubfresh.cache.api.dto.update.OpenCacheAppUpdateDTO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

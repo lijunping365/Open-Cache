@@ -1,7 +1,7 @@
 package com.saucesubfresh.cache.admin.controller;
 
-import com.saucesubfresh.cache.admin.dto.req.OpenCacheCaptchaRequest;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheCaptchaRespDTO;
+import com.saucesubfresh.cache.api.dto.req.OpenCacheCaptchaRequest;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheCaptchaRespDTO;
 import com.saucesubfresh.cache.common.exception.ControllerException;
 import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.starter.captcha.core.image.ImageCodeGenerator;

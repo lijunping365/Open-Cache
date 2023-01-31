@@ -1,8 +1,8 @@
 package com.saucesubfresh.cache.admin.service;
 
 
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticNumberRespDTO;
-import com.saucesubfresh.cache.admin.dto.resp.OpenCacheStatisticReportRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticNumberRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticReportRespDTO;
 
 import java.util.List;
 

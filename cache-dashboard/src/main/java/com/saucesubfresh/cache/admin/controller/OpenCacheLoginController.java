@@ -1,7 +1,7 @@
 package com.saucesubfresh.cache.admin.controller;
 
-import com.saucesubfresh.cache.admin.dto.req.OpenCacheMobileLoginRequest;
-import com.saucesubfresh.cache.admin.dto.req.OpenCachePasswordLoginRequest;
+import com.saucesubfresh.cache.api.dto.req.OpenCacheMobileLoginRequest;
+import com.saucesubfresh.cache.api.dto.req.OpenCachePasswordLoginRequest;
 import com.saucesubfresh.cache.common.exception.ControllerException;
 import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.starter.captcha.exception.ValidateCodeException;

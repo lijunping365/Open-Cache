@@ -4,7 +4,7 @@ package com.saucesubfresh.cache.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.saucesubfresh.cache.admin.dto.req.OpenCacheUserReqDTO;
+import com.saucesubfresh.cache.api.dto.req.OpenCacheUserReqDTO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheUserDO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
