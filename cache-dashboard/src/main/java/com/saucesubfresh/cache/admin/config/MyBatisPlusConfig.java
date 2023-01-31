@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.saucesubfresh.cache.admin.component.PrintSqlInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -18,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *
  * @author lijunping
  */
-@MapperScan(basePackages = {"com.saucesubfresh.Cache.admin.**.mapper"})
+@MapperScan(basePackages = {"com.saucesubfresh.cache.admin.**.mapper"})
 @EnableTransactionManagement
 @Configuration
 public class MyBatisPlusConfig {
@@ -35,16 +32,6 @@ public class MyBatisPlusConfig {
     // 防止全表更新与删除插件
     mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
     return mybatisPlusInterceptor;
-  }
-
-  /**
-   * SQL打印插件
-   */
-  @Bean
-  @ConditionalOnClass(PrintSqlInterceptor.class)
-  @ConditionalOnMissingBean(PrintSqlInterceptor.class)
-  public PrintSqlInterceptor printSqlInterceptor() {
-    return new PrintSqlInterceptor();
   }
 
 }
