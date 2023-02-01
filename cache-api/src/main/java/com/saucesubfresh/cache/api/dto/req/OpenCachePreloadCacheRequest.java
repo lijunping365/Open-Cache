@@ -18,7 +18,4 @@ public class OpenCachePreloadCacheRequest implements Serializable {
     @NotBlank(message = "缓存名称不能为空")
     private String cacheName;
 
-    @NotBlank(message = "服务id不能为空")
-    private String serverId;
-
 }

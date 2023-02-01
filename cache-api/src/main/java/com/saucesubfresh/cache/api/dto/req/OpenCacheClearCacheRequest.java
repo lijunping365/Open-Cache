@@ -15,9 +15,6 @@ public class OpenCacheClearCacheRequest implements Serializable {
     @NotBlank(message = "应用名称不能为空")
     private String namespace;
 
-    @NotBlank(message = "服务id不能为空")
-    private String serverId;
-
     @NotBlank(message = "缓存名称不能为空")
     private String cacheName;
 
