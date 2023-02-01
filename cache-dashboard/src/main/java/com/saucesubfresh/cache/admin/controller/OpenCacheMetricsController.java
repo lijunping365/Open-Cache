@@ -25,7 +25,7 @@ public class OpenCacheMetricsController {
     private OpenCacheMetricsService openCacheMetricsService;
 
     /**
-     * 获取当前指标数据
+     * 返回当前某个应用的某个节点的全部 cacheName 指标数据
      * @param reqDTO
      * @return
      */
