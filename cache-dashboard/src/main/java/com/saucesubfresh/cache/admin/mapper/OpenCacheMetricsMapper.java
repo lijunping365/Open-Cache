@@ -2,7 +2,7 @@ package com.saucesubfresh.cache.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.saucesubfresh.cache.admin.entity.OpenCacheReportDO;
+import com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
  * @author lijunping on 2022/4/11
  */
 @Repository
-public interface OpenCacheReportMapper extends BaseMapper<OpenCacheReportDO> {
+public interface OpenCacheMetricsMapper extends BaseMapper<OpenCacheMetricsDO> {
 
 
-    default List<OpenCacheReportDO> queryList(){
+    default List<OpenCacheMetricsDO> queryList(){
         return selectList(Wrappers.lambdaQuery());
     }
 }

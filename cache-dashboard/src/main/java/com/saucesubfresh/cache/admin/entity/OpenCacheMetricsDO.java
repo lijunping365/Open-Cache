@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
  * @author lijunping
  */
 @Data
-@TableName("open_cache_log")
-public class OpenCacheLogDO implements Serializable {
+@TableName("open_cache_metrics")
+public class OpenCacheMetricsDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -22,38 +22,47 @@ public class OpenCacheLogDO implements Serializable {
 	 */
 	@TableId
 	private Long id;
+
 	/**
 	 * 应用 id
 	 */
 	private Long appId;
+
 	/**
 	 * 缓存实例 id
 	 */
 	private String instanceId;
+
 	/**
 	 * 缓存名称
 	 */
 	private String cacheName;
+
 	/**
-	 * 缓存 key
+	 * 总请求总数
 	 */
-	private String key;
+	private long requestCount;
+
 	/**
-	 * 缓存 value
+	 * 总命中总数
 	 */
-	private String value;
+	private long hitCount;
+
 	/**
-	 * 命令类型
+	 * 总未命中总数
 	 */
-	private String command;
+	private long missCount;
+
 	/**
-	 * 任务执行状态（1 成功，0 失败）
+	 * 命中率
 	 */
-	private Integer status;
+	private double hitRate;
+
 	/**
-	 * 任务失败原因
+	 * 未命中率
 	 */
-	private String cause;
+	private double missRate;
+
 	/**
 	 * 任务日志创建时间
 	 */

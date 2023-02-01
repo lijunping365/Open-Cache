@@ -1,4 +1,4 @@
-package com.saucesubfresh.cache.api.dto.resp;
+package com.saucesubfresh.cache.api.dto.create;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * @author lijunping on 2023/1/31
  */
 @Data
-public class OpenCacheMetricsRespDTO implements Serializable {
+public class OpenCacheMetricsCreateDTO implements Serializable {
 
     private static final long serialVersionUID = -6314523526069041299L;
 

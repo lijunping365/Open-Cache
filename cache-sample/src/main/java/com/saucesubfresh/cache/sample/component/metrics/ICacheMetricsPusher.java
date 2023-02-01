@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 定时上报缓存情况，为了生成每日报表
+ * 定时上报缓存情况
  *
  * @author lijunping on 2022/6/24
  */

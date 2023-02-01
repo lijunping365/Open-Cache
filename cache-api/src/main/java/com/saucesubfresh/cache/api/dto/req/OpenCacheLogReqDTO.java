@@ -4,6 +4,7 @@ import com.saucesubfresh.cache.common.vo.DateTimePageQuery;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 任务运行日志
@@ -18,10 +19,41 @@ public class OpenCacheLogReqDTO extends DateTimePageQuery implements Serializabl
 
     private Long id;
 
-    private Long CacheId;
+    private Long appId;
 
+    /**
+     * 缓存实例 id
+     */
+    private String instanceId;
+
+    /**
+     * 缓存名称
+     */
+    private String cacheName;
+
+    /**
+     * 缓存 key
+     */
+    private String key;
+
+    /**
+     * 缓存 value
+     */
+    private String value;
+
+    /**
+     * 命令类型
+     */
+    private String command;
+
+    /**
+     * 执行状态
+     */
     private Integer status;
 
-    private String cause;
+    /**
+     * 执行时间
+     */
+    private LocalDateTime createTime;
 
 }
