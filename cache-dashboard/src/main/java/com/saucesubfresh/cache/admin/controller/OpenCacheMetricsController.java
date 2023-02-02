@@ -25,7 +25,8 @@ public class OpenCacheMetricsController {
     private OpenCacheMetricsService openCacheMetricsService;
 
     /**
-     * 返回当前某个应用的某个节点的全部 cacheName 指标数据
+     * 返回当前某个应用的某个 cacheName 全部节点指标数据
+     * 获取某一时刻应用内个节点缓存指标对比图数据
      * @param reqDTO
      * @return
      */
@@ -44,15 +45,7 @@ public class OpenCacheMetricsController {
         return Result.succeed(openCacheMetricsService.selectPage(reqDTO));
     }
 
-    /**
-     * 获取某一时刻应用内个节点缓存指标对比图数据
-     * @param time
-     * @return
-     */
-    @GetMapping("/chart")
-    public Result<List<OpenCacheLogRespDTO>> info(@RequestParam("time") String time) {
-        return Result.succeed(openCacheMetricsService.getById(id));
-    }
+
 
     @PutMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable("id") Long id) {

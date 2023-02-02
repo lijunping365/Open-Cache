@@ -16,11 +16,6 @@ public class OpenCacheMetricsReqDTO implements Serializable {
     private Long appId;
 
     /**
-     * 缓存实例 id
-     */
-    private String instanceId;
-
-    /**
      * 缓存名称
      */
     private String cacheName;
