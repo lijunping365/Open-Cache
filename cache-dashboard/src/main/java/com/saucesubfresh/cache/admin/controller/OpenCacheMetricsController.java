@@ -26,30 +26,10 @@ public class OpenCacheMetricsController {
 
     /**
      * 返回当前某个应用的某个 cacheName 全部节点指标数据
-     * 获取某一时刻应用内个节点缓存指标对比图数据
-     * @param reqDTO
-     * @return
      */
-    @GetMapping("/current")
-    public Result<List<OpenCacheMetricsRespDTO>> current(OpenCacheMetricsReqDTO reqDTO) {
-        return Result.succeed(openCacheMetricsService.select(reqDTO));
-    }
-
-    /**
-     * 获取历史指标数据
-     * @param reqDTO
-     * @return
-     */
-    @GetMapping("/page")
-    public Result<PageResult<OpenCacheLogRespDTO>> page(OpenCacheMetricsReqDTO reqDTO) {
-        return Result.succeed(openCacheMetricsService.selectPage(reqDTO));
-    }
-
-
-
-    @PutMapping("/delete/{id}")
-    public Result<Boolean> delete(@PathVariable("id") Long id) {
-        return Result.succeed(openCacheMetricsService.deleteById(id));
+    @GetMapping("/current/allNode")
+    public Result<PageResult<OpenCacheMetricsRespDTO>> queryMetrics(OpenCacheMetricsReqDTO reqDTO) {
+        return Result.succeed(openCacheMetricsService.queryMetrics(reqDTO));
     }
 
 }

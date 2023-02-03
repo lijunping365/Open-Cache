@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.admin.service;
 
 import com.saucesubfresh.cache.api.dto.req.OpenCacheMetricsReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheMetricsRespDTO;
+import com.saucesubfresh.cache.common.vo.PageResult;
 
 import java.util.List;
 
@@ -10,5 +11,5 @@ import java.util.List;
  */
 public interface OpenCacheMetricsService {
 
-    List<OpenCacheMetricsRespDTO> selectCurrent(OpenCacheMetricsReqDTO reqDTO);
+    PageResult<OpenCacheMetricsRespDTO> queryMetrics(OpenCacheMetricsReqDTO reqDTO);
 }

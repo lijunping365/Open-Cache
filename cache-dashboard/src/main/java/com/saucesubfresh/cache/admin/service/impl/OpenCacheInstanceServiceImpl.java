@@ -1,13 +1,12 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
+import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
+import com.saucesubfresh.cache.admin.service.OpenCacheInstanceService;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheInstanceReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheAppRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheInstanceRespDTO;
-import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
-import com.saucesubfresh.cache.admin.service.OpenCacheInstanceService;
 import com.saucesubfresh.cache.common.time.LocalDateTimeUtil;
 import com.saucesubfresh.cache.common.vo.PageResult;
-import com.saucesubfresh.rpc.client.manager.InstanceManager;
 import com.saucesubfresh.rpc.client.store.InstanceStore;
 import com.saucesubfresh.rpc.core.information.ServerInformation;
 import org.springframework.stereotype.Service;
@@ -27,14 +26,11 @@ import java.util.stream.Collectors;
 public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
     private final InstanceStore instanceStore;
-    private final InstanceManager instanceManager;
     private final OpenCacheAppService openCacheAppService;
 
     public OpenCacheInstanceServiceImpl(InstanceStore instanceStore,
-                                        InstanceManager instanceManager,
                                         OpenCacheAppService openCacheAppService) {
         this.instanceStore = instanceStore;
-        this.instanceManager = instanceManager;
         this.openCacheAppService = openCacheAppService;
     }
 
@@ -50,16 +46,6 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
         cacheInstance.sort(Comparator.comparing(OpenCacheInstanceRespDTO::getOnlineTime).reversed());
         return PageResult.build(cacheInstance, cacheInstance.size(), instanceReqDTO.getCurrent(), instanceReqDTO.getPageSize());
-    }
-
-    @Override
-    public Boolean offlineServer(String serverId) {
-        return instanceManager.offlineServer(serverId);
-    }
-
-    @Override
-    public Boolean onlineServer(String serverId) {
-        return instanceManager.offlineServer(serverId);
     }
 
     @Override

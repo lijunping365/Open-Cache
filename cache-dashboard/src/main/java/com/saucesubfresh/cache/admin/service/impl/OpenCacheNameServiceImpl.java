@@ -46,7 +46,7 @@ public class OpenCacheNameServiceImpl implements OpenCacheNameService {
         try {
             MessageResponseBody response = clusterInvoker.invoke(message);
             Result<?> result = SerializationUtils.deserialize(response.getBody(), Result.class);
-            return Objects.isNull(result.getData()) ? null : (List<String>) result.getData();
+            return result.isSuccess() ? (List<String>) result.getData() : null;
         }catch (Exception e){
             throw new ServiceException(e.getMessage());
         }

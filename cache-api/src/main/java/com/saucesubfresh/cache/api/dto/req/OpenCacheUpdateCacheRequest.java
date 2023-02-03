@@ -12,8 +12,8 @@ import java.io.Serializable;
 public class OpenCacheUpdateCacheRequest implements Serializable {
     private static final long serialVersionUID = -3473064349983754433L;
 
-    @NotBlank(message = "应用名称不能为空")
-    private String namespace;
+    @NotBlank(message = "应用id不能为空")
+    private Long appId;
 
     @NotBlank(message = "缓存名称不能为空")
     private String cacheName;

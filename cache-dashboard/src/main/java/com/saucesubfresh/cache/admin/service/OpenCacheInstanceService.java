@@ -14,9 +14,5 @@ public interface OpenCacheInstanceService {
     
     PageResult<OpenCacheInstanceRespDTO> selectPage(OpenCacheInstanceReqDTO instanceReqDTO);
 
-    Boolean offlineServer(String serverId);
-
-    Boolean onlineServer(String serverId);
-
     List<OpenCacheInstanceRespDTO> getInstanceList(Long appId);
 }

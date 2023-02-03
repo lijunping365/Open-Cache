@@ -15,8 +15,6 @@ public class OpenCacheMetricsReqDTO implements Serializable {
     @NotBlank(message = "应用名称不能为空")
     private Long appId;
 
-    /**
-     * 缓存名称
-     */
+    @NotBlank(message = "缓存名称不能为空")
     private String cacheName;
 }
