@@ -49,24 +49,23 @@ public class CacheMessageProcessor implements MessageProcess {
         String cacheName = request.getCacheName();
         Object key = request.getKey();
         Object value = request.getValue();
-        ClusterCache cache = cacheManager.getCache(cacheName);
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
                 case CLEAR:
-                    cache.clear();
+                    cacheManager.getCache(cacheName).clear();
                     break;
                 case INVALIDATE:
-                    cache.evict(key);
+                    cacheManager.getCache(cacheName).evict(key);
                     break;
                 case PRELOAD:
-                    cache.preloadCache();
+                    cacheManager.getCache(cacheName).preloadCache();
                     break;
                 case UPDATE:
-                    cache.put(key, value);
+                    cacheManager.getCache(cacheName).put(key, value);
                     break;
                 case GET:
-                    Object o = cache.get(key);
+                    Object o = cacheManager.getCache(cacheName).get(key);
                     response.setData(Objects.isNull(o) ? null : JSON.toJSON(o));
                     break;
                 case QUERY_CACHE_NAMES:
