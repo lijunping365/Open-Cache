@@ -5,7 +5,7 @@ import com.saucesubfresh.cache.admin.service.OpenCacheMetricsService;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheMetricsReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheInstanceRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheMetricsRespDTO;
-import com.saucesubfresh.cache.common.domain.CacheMessageBody;
+import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
 import com.saucesubfresh.cache.common.vo.PageResult;
@@ -18,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author lijunping on 2023/1/31
@@ -47,7 +46,7 @@ public class OpenCacheMetricsServiceImpl implements OpenCacheMetricsService {
 
         for (OpenCacheInstanceRespDTO instance : cacheInstance) {
             Message message = new Message();
-            CacheMessageBody messageBody = new CacheMessageBody();
+            CacheMessageRequest messageBody = new CacheMessageRequest();
             messageBody.setCacheName(reqDTO.getCacheName());
             messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_METRICS.getValue());
             message.setBody(SerializationUtils.serialize(messageBody));

@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CacheMessageBody implements Serializable {
+public class CacheMessageRequest implements Serializable {
     private static final long serialVersionUID = 6990779922183880977L;
     /**
      * The message id

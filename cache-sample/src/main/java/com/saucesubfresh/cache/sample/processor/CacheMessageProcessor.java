@@ -1,11 +1,12 @@
 package com.saucesubfresh.cache.sample.processor;
 
-import com.saucesubfresh.cache.common.domain.CacheMessageBody;
+import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
+import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
-import com.saucesubfresh.cache.common.vo.Result;
 import com.saucesubfresh.rpc.core.Message;
+import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
 import com.saucesubfresh.starter.cache.exception.CacheExecuteException;
@@ -42,40 +43,37 @@ public class CacheMessageProcessor implements MessageProcess {
     @Override
     public byte[] process(Message message) {
         final byte[] body = message.getBody();
-        CacheMessageBody messageBody = SerializationUtils.deserialize(body, CacheMessageBody.class);
-        Result<Object> result = doProcess(messageBody);
-        return SerializationUtils.serialize(result);
-    }
-
-    private Result<Object> doProcess(CacheMessageBody messageBody){
-        CacheCommandEnum command = CacheCommandEnum.of(messageBody.getCommand());
+        CacheMessageRequest request = SerializationUtils.deserialize(body, CacheMessageRequest.class);
+        CacheCommandEnum command = CacheCommandEnum.of(request.getCommand());
         if (Objects.isNull(command)){
-            return Result.failed("参数非法");
+            throw new RpcException("the parameter command must not be null");
         }
 
         if (!command.isInner()){
             try {
-                cacheExecutor.execute(convert(messageBody));
-                return Result.succeed();
+                cacheExecutor.execute(convert(request));
             }catch (CacheExecuteException e){
                 log.error("缓存执行异常：{}", e.getMessage());
-                return Result.failed(e.getMessage());
+                throw new RpcException(e.getMessage());
             }
+            return null;
         }
 
+        CacheMessageResponse response = new CacheMessageResponse();
         switch (command){
             case QUERY_CACHE_NAMES:
                 Collection<String> cacheNames = cacheManager.getCacheNames();
-                return Result.succeed(cacheNames);
+                response.setData(cacheNames);
+                break;
             case QUERY_CACHE_METRICS:
-                List<CacheStatsInfo> cacheMetrics = getCacheMetrics(messageBody);
-                return Result.succeed(cacheMetrics);
-            default:
-                return Result.succeed();
+                List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
+                response.setData(cacheMetrics);
+                break;
         }
+        return SerializationUtils.serialize(response);
     }
 
-    private List<CacheStatsInfo> getCacheMetrics(CacheMessageBody messageBody){
+    private List<CacheStatsInfo> getCacheMetrics(CacheMessageRequest messageBody){
         List<String> cacheNames = new ArrayList<>();
         String cacheName = messageBody.getCacheName();
         if (StringUtils.isNotBlank(cacheName)){
@@ -102,7 +100,7 @@ public class CacheMessageProcessor implements MessageProcess {
         }).collect(Collectors.toList());
     }
 
-    private CacheMessage convert(CacheMessageBody messageBody){
+    private CacheMessage convert(CacheMessageRequest messageBody){
         return CacheMessage.builder()
                 .cacheName(messageBody.getCacheName())
                 .command(CacheCommand.of(messageBody.getCommand()))
