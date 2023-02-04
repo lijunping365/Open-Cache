@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.sample.processor;
 
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
+import com.saucesubfresh.cache.common.domain.CacheNameInfo;
 import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.json.JSON;
@@ -10,17 +11,15 @@ import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
-import com.saucesubfresh.starter.cache.exception.CacheExecuteException;
 import com.saucesubfresh.starter.cache.executor.CacheExecutor;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
-import com.saucesubfresh.starter.cache.message.CacheCommand;
-import com.saucesubfresh.starter.cache.message.CacheMessage;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,26 +49,42 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException("the parameter command must not be null");
         }
 
-        if (!command.isInner()){
-            try {
-                cacheExecutor.execute(convert(request));
-            }catch (CacheExecuteException e){
-                log.error("缓存执行异常：{}", e.getMessage());
-                throw new RpcException(e.getMessage());
-            }
-            return null;
-        }
-
+        String cacheName = request.getCacheName();
+        Object key = request.getKey();
+        Object value = request.getValue();
+        ClusterCache cache = cacheManager.getCache(cacheName);
         CacheMessageResponse response = new CacheMessageResponse();
-        switch (command){
-            case QUERY_CACHE_NAMES:
-                Collection<String> cacheNames = cacheManager.getCacheNames();
-                response.setData(JSON.toJSON(cacheNames));
-                break;
-            case QUERY_CACHE_METRICS:
-                List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
-                response.setData(JSON.toJSON(cacheMetrics));
-                break;
+        try {
+            switch (command){
+                case CLEAR:
+                    cache.clear();
+                    break;
+                case INVALIDATE:
+                    cache.evict(key);
+                    break;
+                case PRELOAD:
+                    cache.preloadCache();
+                    break;
+                case UPDATE:
+                    cache.put(key, value);
+                    break;
+                case GET:
+                    Object o = cache.get(key);
+                    response.setData(Objects.isNull(o) ? null : JSON.toJSON(o));
+                    break;
+                case QUERY_CACHE_NAMES:
+                    Collection<String> cacheNames = cacheManager.getCacheNames();
+                    response.setData(JSON.toJSON(cacheNames));
+                    break;
+                case QUERY_CACHE_METRICS:
+                    List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
+                    response.setData(JSON.toJSON(cacheMetrics));
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unsupported Operation");
+            }
+        }catch (Exception e){
+            throw new RpcException(e.getMessage());
         }
         return SerializationUtils.serialize(response);
     }
@@ -99,16 +114,5 @@ public class CacheMessageProcessor implements MessageProcess {
             cacheStatsInfo.setMissRate(stats.missRate());
             return cacheStatsInfo;
         }).collect(Collectors.toList());
-    }
-
-    private CacheMessage convert(CacheMessageRequest messageBody){
-        return CacheMessage.builder()
-                .cacheName(messageBody.getCacheName())
-                .command(CacheCommand.of(messageBody.getCommand()))
-                .key(messageBody.getKey())
-                .value(messageBody.getValue())
-                .instanceId(cacheProperties.getInstanceId())
-                .msgId(messageBody.getMsgId())
-                .build();
     }
 }

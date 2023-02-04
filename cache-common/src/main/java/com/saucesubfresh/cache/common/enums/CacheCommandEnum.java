@@ -7,8 +7,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum CacheCommandEnum {
 
-    QUERY_CACHE_NAMES(true, "query_cache_names"), QUERY_CACHE_METRICS(true, "query_cache_names"),
-
     /**
      * Invalidate local cache entry across all LocalCachedMap instances on map entry change. Broadcasts map entry hash (16 bytes) to all instances.
      */
@@ -28,28 +26,31 @@ public enum CacheCommandEnum {
      * Preload local cache entry across all LocalCachedMap instances on map entry change. Broadcasts map entry hash (16 bytes) to all instances.
      */
     PRELOAD("preload"),
+
+    /**
+     * Preload local cache entry across all LocalCachedMap instances on map entry change. Broadcasts map entry hash (16 bytes) to all instances.
+     */
+    GET("get"),
+
+    /**
+     * Query cacheNames
+     */
+    QUERY_CACHE_NAMES("query_cache_names"),
+
+    /**
+     * Query cacheMetrics
+     */
+    QUERY_CACHE_METRICS("query_cache_metrics"),
     ;
 
     private final String value;
 
-    private final boolean inner;
-
     CacheCommandEnum(String value) {
-        this.inner = false;
-        this.value = value;
-    }
-
-    CacheCommandEnum(boolean inner, String value) {
-        this.inner = inner;
         this.value = value;
     }
 
     public String getValue() {
         return value;
-    }
-
-    public boolean isInner() {
-        return inner;
     }
 
     public static CacheCommandEnum of(String value){
