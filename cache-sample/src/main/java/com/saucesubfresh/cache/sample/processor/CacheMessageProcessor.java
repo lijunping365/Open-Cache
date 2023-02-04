@@ -4,6 +4,7 @@ import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
+import com.saucesubfresh.cache.common.json.JSON;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
 import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.exception.RpcException;
@@ -63,11 +64,11 @@ public class CacheMessageProcessor implements MessageProcess {
         switch (command){
             case QUERY_CACHE_NAMES:
                 Collection<String> cacheNames = cacheManager.getCacheNames();
-                response.setData(cacheNames);
+                response.setData(JSON.toJSON(cacheNames));
                 break;
             case QUERY_CACHE_METRICS:
                 List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
-                response.setData(cacheMetrics);
+                response.setData(JSON.toJSON(cacheMetrics));
                 break;
         }
         return SerializationUtils.serialize(response);
