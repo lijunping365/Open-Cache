@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,12 +80,10 @@ public class OpenCacheServiceImpl implements OpenCacheService {
     @Override
     public boolean preloadCache(OpenCachePreloadCacheRequest request) {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
-        List<String> cacheNames = request.getCacheNames();
-
         Message message = new Message();
         message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
-        //messageBody.setCacheName(request.getCacheName());
+        messageBody.setCacheNames(request.getCacheNames());
         messageBody.setCommand(CacheCommandEnum.PRELOAD.getValue());
         message.setBody(SerializationUtils.serialize(messageBody));
 
@@ -104,7 +103,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         Message message = new Message();
         message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
-        //messageBody.setCacheName(request.getCacheName());
+        messageBody.setCacheNames(request.getCacheNames());
         messageBody.setCommand(CacheCommandEnum.CLEAR.getValue());
         message.setBody(SerializationUtils.serialize(messageBody));
 
@@ -121,12 +120,12 @@ public class OpenCacheServiceImpl implements OpenCacheService {
     @Override
     public boolean evictCache(OpenCacheEvictCacheRequest request) {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
-        Message message = new Message();
-        message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
-        messageBody.setCacheName(request.getCacheName());
+        messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
         messageBody.setKey(request.getKey());
         messageBody.setCommand(CacheCommandEnum.INVALIDATE.getValue());
+        Message message = new Message();
+        message.setNamespace(openCacheAppDO.getAppName());
         message.setBody(SerializationUtils.serialize(messageBody));
 
         String errMsg = null;
@@ -142,13 +141,13 @@ public class OpenCacheServiceImpl implements OpenCacheService {
     @Override
     public boolean updateCache(OpenCacheUpdateCacheRequest request) {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
-        Message message = new Message();
-        message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
-        messageBody.setCacheName(request.getCacheName());
+        messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
         messageBody.setKey(request.getKey());
         messageBody.setValue(request.getValue());
         messageBody.setCommand(CacheCommandEnum.UPDATE.getValue());
+        Message message = new Message();
+        message.setNamespace(openCacheAppDO.getAppName());
         message.setBody(SerializationUtils.serialize(messageBody));
 
         String errMsg = null;

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author: 李俊平
@@ -18,13 +19,13 @@ import java.io.Serializable;
 public class CacheMessageRequest implements Serializable {
     private static final long serialVersionUID = 6990779922183880977L;
     /**
+     * The cache name
+     */
+    private List<String> cacheNames;
+    /**
      * The message id
      */
     private String msgId;
-    /**
-     * The cache name
-     */
-    private String cacheName;
     /**
      * The message command
      */

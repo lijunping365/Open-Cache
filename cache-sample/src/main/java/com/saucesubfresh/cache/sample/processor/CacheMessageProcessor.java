@@ -46,26 +46,25 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException("the parameter command must not be null");
         }
 
-        String cacheName = request.getCacheName();
         Object key = request.getKey();
         Object value = request.getValue();
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
                 case CLEAR:
-                    cacheManager.getCache(cacheName).clear();
+                    request.getCacheNames().forEach(e-> cacheManager.getCache(e).clear());
                     break;
                 case INVALIDATE:
-                    cacheManager.getCache(cacheName).evict(key);
+                    cacheManager.getCache(request.getCacheNames().get(0)).evict(key);
                     break;
                 case PRELOAD:
-                    cacheManager.getCache(cacheName).preloadCache();
+                    request.getCacheNames().forEach(e->cacheManager.getCache(e).preloadCache());
                     break;
                 case UPDATE:
-                    cacheManager.getCache(cacheName).put(key, value);
+                    cacheManager.getCache(request.getCacheNames().get(0)).put(key, value);
                     break;
                 case GET:
-                    Object o = cacheManager.getCache(cacheName).get(key);
+                    Object o = cacheManager.getCache(request.getCacheNames().get(0)).get(key);
                     response.setData(Objects.isNull(o) ? null : JSON.toJSON(o));
                     break;
                 case QUERY_CACHE_NAMES:
@@ -96,13 +95,7 @@ public class CacheMessageProcessor implements MessageProcess {
     }
 
     private List<CacheStatsInfo> getCacheMetrics(CacheMessageRequest messageBody){
-        List<String> cacheNames = new ArrayList<>();
-        String cacheName = messageBody.getCacheName();
-        if (StringUtils.isNotBlank(cacheName)){
-            cacheNames.add(cacheName);
-        }else {
-            cacheNames.addAll(cacheManager.getCacheNames());
-        }
+        List<String> cacheNames = messageBody.getCacheNames();
 
         if (CollectionUtils.isEmpty(cacheNames)){
             return Collections.emptyList();
@@ -111,7 +104,7 @@ public class CacheMessageProcessor implements MessageProcess {
         return cacheNames.stream().map(e->{
             CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
             cacheStatsInfo.setCacheName(e);
-            final ClusterCache cache = cacheManager.getCache(cacheName);
+            final ClusterCache cache = cacheManager.getCache(e);
             final CacheStats stats = cache.getStats();
             cacheStatsInfo.setHitCount(stats.getHitCount());
             cacheStatsInfo.setMissCount(stats.getMissCount());
