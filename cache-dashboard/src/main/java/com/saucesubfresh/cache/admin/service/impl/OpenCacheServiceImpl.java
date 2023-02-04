@@ -8,6 +8,7 @@ import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
+import com.saucesubfresh.cache.common.domain.CacheNameInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
@@ -64,12 +65,13 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             return PageResult.<OpenCacheNameRespDTO>newBuilder().build();
         }
 
-        List<String> cacheNames = JSON.parseList(response.getData(), String.class);
-        log.info("cacheNames {}", cacheNames);
+        List<CacheNameInfo> cacheNames = JSON.parseList(response.getData(), CacheNameInfo.class);
         List<OpenCacheNameRespDTO> records = new ArrayList<>();
-        for (String cacheName : cacheNames) {
+        for (CacheNameInfo cacheName : cacheNames) {
             OpenCacheNameRespDTO cacheNameRespDTO = new OpenCacheNameRespDTO();
-            cacheNameRespDTO.setCacheName(cacheName);
+            cacheNameRespDTO.setCacheName(cacheName.getCacheName());
+            cacheNameRespDTO.setLocalCacheKeySize(cacheName.getLocalCacheKeySize());
+            cacheNameRespDTO.setRemoteCacheKeySize(cacheName.getRemoteCacheKeySize());
             records.add(cacheNameRespDTO);
         }
         return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());

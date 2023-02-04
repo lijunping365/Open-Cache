@@ -11,16 +11,17 @@ import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
-import com.saucesubfresh.starter.cache.executor.CacheExecutor;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
-import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -31,13 +32,9 @@ import java.util.stream.Collectors;
 public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
-    private final CacheExecutor cacheExecutor;
-    private final CacheProperties cacheProperties;
 
-    public CacheMessageProcessor(CacheManager cacheManager, CacheExecutor cacheExecutor, CacheProperties cacheProperties) {
+    public CacheMessageProcessor(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-        this.cacheExecutor = cacheExecutor;
-        this.cacheProperties = cacheProperties;
     }
 
     @Override
@@ -73,7 +70,7 @@ public class CacheMessageProcessor implements MessageProcess {
                     response.setData(Objects.isNull(o) ? null : JSON.toJSON(o));
                     break;
                 case QUERY_CACHE_NAMES:
-                    Collection<String> cacheNames = cacheManager.getCacheNames();
+                    List<CacheNameInfo> cacheNames = getCacheName();
                     response.setData(JSON.toJSON(cacheNames));
                     break;
                 case QUERY_CACHE_METRICS:
@@ -87,6 +84,17 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException(e.getMessage());
         }
         return SerializationUtils.serialize(response);
+    }
+
+    private List<CacheNameInfo> getCacheName(){
+        return cacheManager.getCacheNames().stream().map(e->{
+            CacheNameInfo cacheNameInfo = new CacheNameInfo();
+            cacheNameInfo.setCacheName(e);
+            final ClusterCache cache = cacheManager.getCache(e);
+            cacheNameInfo.setLocalCacheKeySize(cache.getLocalCacheCount());
+            cacheNameInfo.setRemoteCacheKeySize(cache.getRemoteCacheCount());
+            return cacheNameInfo;
+        }).collect(Collectors.toList());
     }
 
     private List<CacheStatsInfo> getCacheMetrics(CacheMessageRequest messageBody){
