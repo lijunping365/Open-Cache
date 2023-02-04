@@ -13,6 +13,7 @@ import com.saucesubfresh.starter.cache.executor.CacheExecutor;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
 import com.saucesubfresh.starter.cache.message.CacheCommand;
 import com.saucesubfresh.starter.cache.message.CacheMessage;
+import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +31,12 @@ public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
     private final CacheExecutor cacheExecutor;
+    private final CacheProperties cacheProperties;
 
-    public CacheMessageProcessor(CacheManager cacheManager, CacheExecutor cacheExecutor) {
+    public CacheMessageProcessor(CacheManager cacheManager, CacheExecutor cacheExecutor, CacheProperties cacheProperties) {
         this.cacheManager = cacheManager;
         this.cacheExecutor = cacheExecutor;
+        this.cacheProperties = cacheProperties;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class CacheMessageProcessor implements MessageProcess {
                 .command(CacheCommand.of(messageBody.getCommand()))
                 .key(messageBody.getKey())
                 .value(messageBody.getValue())
-                .instanceId(messageBody.getInstanceId())
+                .instanceId(cacheProperties.getInstanceId())
                 .msgId(messageBody.getMsgId())
                 .build();
     }

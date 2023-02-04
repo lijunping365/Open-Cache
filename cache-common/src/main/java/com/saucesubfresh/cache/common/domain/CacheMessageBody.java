@@ -17,11 +17,18 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CacheMessageBody implements Serializable {
     private static final long serialVersionUID = 6990779922183880977L;
-
+    /**
+     * The message id
+     */
+    private String msgId;
     /**
      * The cache name
      */
     private String cacheName;
+    /**
+     * The message command
+     */
+    private String command;
     /**
      * The cache key
      */
@@ -30,16 +37,6 @@ public class CacheMessageBody implements Serializable {
      * The cache value
      */
     private Object value;
-    /**
-     * The cache instance id
-     */
-    private String instanceId;
-    /**
-     * The message id
-     */
-    private String msgId;
-    /**
-     * The message command
-     */
-    private String command;
+
+
 }
