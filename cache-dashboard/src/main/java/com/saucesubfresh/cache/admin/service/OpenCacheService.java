@@ -1,14 +1,18 @@
 package com.saucesubfresh.cache.admin.service;
 
-import com.saucesubfresh.cache.api.dto.req.OpenCacheClearCacheRequest;
-import com.saucesubfresh.cache.api.dto.req.OpenCacheEvictCacheRequest;
-import com.saucesubfresh.cache.api.dto.req.OpenCachePreloadCacheRequest;
-import com.saucesubfresh.cache.api.dto.req.OpenCacheUpdateCacheRequest;
+import com.saucesubfresh.cache.api.dto.req.*;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
+import com.saucesubfresh.cache.common.vo.PageResult;
 
 /**
  * @author lijunping on 2023/1/31
  */
-public interface OpenCacheOperationService {
+public interface OpenCacheService {
+
+    /**
+     * 查询 cacheNames
+     */
+    PageResult<OpenCacheNameRespDTO> cacheNames(OpenCacheNameReqDTO reqDTO);
 
     /**
      * 二级缓存数据加载到一级缓存

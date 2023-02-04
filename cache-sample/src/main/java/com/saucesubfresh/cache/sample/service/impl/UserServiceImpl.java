@@ -19,4 +19,13 @@ public class UserServiceImpl implements UserService {
         userDO.setName("lijunping & pengguifang");
         return userDO;
     }
+
+    @OpenCacheable(cacheName = "test2", key = "#id")
+    @Override
+    public UserDO loadUserById2(Long id) {
+        UserDO userDO = new UserDO();
+        userDO.setId(1L);
+        userDO.setName("lijunping & pengguifang ====");
+        return userDO;
+    }
 }

@@ -8,4 +8,6 @@ import com.saucesubfresh.cache.sample.domain.UserDO;
 public interface UserService {
 
     UserDO loadUserById(Long id);
+
+    UserDO loadUserById2(Long id);
 }

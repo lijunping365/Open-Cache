@@ -24,4 +24,10 @@ public class UserController {
         final UserDO userDO = userService.loadUserById(id);
         return Result.succeed(userDO);
     }
+
+    @GetMapping("/load2")
+    public Result<UserDO> loadUser2(@RequestParam Long id){
+        final UserDO userDO = userService.loadUserById(id);
+        return Result.succeed(userDO);
+    }
 }
