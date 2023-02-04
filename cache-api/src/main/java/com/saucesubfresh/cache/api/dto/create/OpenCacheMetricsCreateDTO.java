@@ -3,6 +3,7 @@ package com.saucesubfresh.cache.api.dto.create;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -33,27 +34,27 @@ public class OpenCacheMetricsCreateDTO implements Serializable {
     /**
      * 总请求总数
      */
-    private long requestCount;
+    private Long requestCount;
 
     /**
      * 总命中总数
      */
-    private long hitCount;
+    private Long hitCount;
 
     /**
      * 总未命中总数
      */
-    private long missCount;
+    private Long missCount;
 
     /**
      * 命中率
      */
-    private double hitRate;
+    private BigDecimal hitRate;
 
     /**
      * 未命中率
      */
-    private double missRate;
+    private BigDecimal missRate;
 
     /**
      * 任务日志创建时间
