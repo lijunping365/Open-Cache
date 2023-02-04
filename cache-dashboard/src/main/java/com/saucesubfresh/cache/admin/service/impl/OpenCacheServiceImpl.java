@@ -70,8 +70,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         for (CacheNameInfo cacheName : cacheNames) {
             OpenCacheNameRespDTO cacheNameRespDTO = new OpenCacheNameRespDTO();
             cacheNameRespDTO.setCacheName(cacheName.getCacheName());
-            cacheNameRespDTO.setLocalCacheKeySize(cacheName.getLocalCacheKeySize());
-            cacheNameRespDTO.setRemoteCacheKeySize(cacheName.getRemoteCacheKeySize());
+            cacheNameRespDTO.setCacheKeySize(cacheName.getCacheKeySize());
             records.add(cacheNameRespDTO);
         }
         return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());

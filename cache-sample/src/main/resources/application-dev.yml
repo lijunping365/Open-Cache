@@ -27,7 +27,7 @@ com:
         server-port: 5200
         server-name: open-cache-app
     cache:
-      namespace: cache-sample-one
+      namespace: open-cache-app
       instance-id: 127.0.0.1:5200
 
 

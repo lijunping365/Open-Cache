@@ -18,12 +18,7 @@ public class CacheNameInfo implements Serializable {
     private String cacheName;
 
     /**
-     * 本地缓存 key size
+     * 缓存 key size
      */
-    private Integer localCacheKeySize;
-
-    /**
-     * 远程缓存 key size
-     */
-    private Integer remoteCacheKeySize;
+    private Integer cacheKeySize;
 }

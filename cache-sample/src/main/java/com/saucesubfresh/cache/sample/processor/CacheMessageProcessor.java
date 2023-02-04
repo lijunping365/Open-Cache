@@ -90,8 +90,7 @@ public class CacheMessageProcessor implements MessageProcess {
             CacheNameInfo cacheNameInfo = new CacheNameInfo();
             cacheNameInfo.setCacheName(e);
             final ClusterCache cache = cacheManager.getCache(e);
-            cacheNameInfo.setLocalCacheKeySize(cache.getLocalCacheCount());
-            cacheNameInfo.setRemoteCacheKeySize(cache.getRemoteCacheCount());
+            cacheNameInfo.setCacheKeySize(cache.getCacheKeyCount());
             return cacheNameInfo;
         }).collect(Collectors.toList());
     }
