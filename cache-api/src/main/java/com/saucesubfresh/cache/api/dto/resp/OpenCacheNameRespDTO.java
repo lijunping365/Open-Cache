@@ -14,15 +14,6 @@ import java.io.Serializable;
 @Data
 public class OpenCacheNameRespDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 应用 id
-     */
-    private Long appId;
-    /**
-     * 缓存实例 id
-     */
-    private String instanceId;
     /**
      * 缓存名称
      */

@@ -18,15 +18,9 @@ public class OpenCacheUpdateCacheRequest implements Serializable {
     @NotBlank(message = "缓存名称不能为空")
     private String cacheName;
 
-    /**
-     * 可以为 json
-     */
     @NotBlank(message = "缓存key不能为空")
     private String key;
 
-    /**
-     * 可以为 json
-     */
     @NotBlank(message = "缓存值不能为空")
     private String value;
 
