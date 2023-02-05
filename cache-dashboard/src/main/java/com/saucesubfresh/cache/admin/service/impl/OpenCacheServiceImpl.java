@@ -6,6 +6,7 @@ import com.saucesubfresh.cache.admin.mapper.OpenCacheLogMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
 import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.domain.CacheNameInfo;
@@ -158,6 +159,34 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         }
         //recordLog(e, response, errMsg);
         return true;
+    }
+
+    @Override
+    public OpenCacheValueRespDTO getCache(OpenCacheGetCacheRequest request) {
+        OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
+        CacheMessageRequest messageBody = new CacheMessageRequest();
+        messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
+        messageBody.setKey(request.getKey());
+        messageBody.setCommand(CacheCommandEnum.GET.getValue());
+        Message message = new Message();
+        message.setNamespace(openCacheAppDO.getAppName());
+        message.setBody(SerializationUtils.serialize(messageBody));
+
+
+        MessageResponseBody responseBody;
+        try {
+            responseBody = doInvoke(message);
+        }catch (RpcException ex){
+            throw new ServiceException(ex.getMessage());
+        }
+
+        byte[] body = responseBody.getBody();
+        CacheMessageResponse response = SerializationUtils.deserialize(body, CacheMessageResponse.class);
+
+        OpenCacheValueRespDTO respDTO = new OpenCacheValueRespDTO();
+        respDTO.setKey(request.getKey());
+        respDTO.setValue(response.getData());
+        return respDTO;
     }
 
     private MessageResponseBody doInvoke(Message message){

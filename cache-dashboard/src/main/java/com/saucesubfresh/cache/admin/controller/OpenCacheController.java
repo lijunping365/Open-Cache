@@ -3,6 +3,7 @@ package com.saucesubfresh.cache.admin.controller;
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
 import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.vo.PageResult;
 import com.saucesubfresh.cache.common.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ public class OpenCacheController {
     @GetMapping("/cacheNames")
     public Result<PageResult<OpenCacheNameRespDTO>> cacheNames(OpenCacheNameReqDTO reqDTO) {
         return Result.succeed(openCacheService.cacheNames(reqDTO));
+    }
+
+    @PostMapping("/get")
+    public Result<OpenCacheValueRespDTO> getCache(@RequestBody @Valid OpenCacheGetCacheRequest request) {
+        return Result.succeed(openCacheService.getCache(request));
     }
 
     @PostMapping("/preload")

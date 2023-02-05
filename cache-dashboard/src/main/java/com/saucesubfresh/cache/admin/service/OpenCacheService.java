@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.admin.service;
 
 import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.vo.PageResult;
 
 /**
@@ -26,14 +27,19 @@ public interface OpenCacheService {
 
     /**
      * 根据 key 清除
-     * @param key
+     * @param request
      */
     boolean evictCache(OpenCacheEvictCacheRequest request);
 
     /**
      * 添加缓存
-     * @param key
-     * @param value
+     * @param request
      */
     boolean updateCache(OpenCacheUpdateCacheRequest request);
+
+    /**
+     * 根据 key 清除
+     * @param request
+     */
+    OpenCacheValueRespDTO getCache(OpenCacheGetCacheRequest request);
 }
