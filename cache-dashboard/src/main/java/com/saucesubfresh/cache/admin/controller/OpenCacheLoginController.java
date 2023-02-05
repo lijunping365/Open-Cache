@@ -13,13 +13,12 @@ import com.saucesubfresh.starter.oauth.exception.AuthenticationException;
 import com.saucesubfresh.starter.oauth.request.MobileLoginRequest;
 import com.saucesubfresh.starter.oauth.request.PasswordLoginRequest;
 import com.saucesubfresh.starter.oauth.token.AccessToken;
+import com.saucesubfresh.starter.oauth.token.TokenStore;
+import com.saucesubfresh.starter.security.exception.InvalidBearerTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -40,6 +39,9 @@ public class OpenCacheLoginController {
 
     @Autowired
     private SmsMobileAuthenticationProcessor smsMobileAuthentication;
+
+    @Autowired
+    private TokenStore tokenStore;
 
     /**
      * 用户名密码登录
@@ -90,6 +92,15 @@ public class OpenCacheLoginController {
             return Result.succeed(accessToken);
         } catch (AuthenticationException e){
             throw new ControllerException(e.getMessage());
+        }
+    }
+
+    @GetMapping("/refreshToken")
+    public Result<AccessToken> refreshToken(@RequestParam("refreshToken") String refreshToken){
+        try {
+            return Result.succeed(tokenStore.refreshToken(refreshToken));
+        } catch (AuthenticationException e){
+            throw new InvalidBearerTokenException(e.getMessage());
         }
     }
 }

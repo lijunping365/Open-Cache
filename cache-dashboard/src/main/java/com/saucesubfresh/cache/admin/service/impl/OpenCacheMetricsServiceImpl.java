@@ -16,6 +16,7 @@ import com.saucesubfresh.rpc.core.information.ServerInformation;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class OpenCacheMetricsServiceImpl implements OpenCacheMetricsService {
         for (OpenCacheInstanceRespDTO instance : cacheInstance) {
             Message message = new Message();
             CacheMessageRequest messageBody = new CacheMessageRequest();
-            messageBody.setCacheName(reqDTO.getCacheName());
+            messageBody.setCacheNames(Collections.singletonList(reqDTO.getCacheName()));
             messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_METRICS.getValue());
             message.setBody(SerializationUtils.serialize(messageBody));
             String[] serverId = instance.getServerId().split(CommonConstant.Symbol.MH);
