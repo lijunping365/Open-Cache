@@ -1,15 +1,7 @@
 package com.saucesubfresh.cache.sample.config;
 
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import com.saucesubfresh.starter.cache.executor.CacheExecutor;
-import com.saucesubfresh.starter.cache.manager.RedisCaffeineCacheManager;
-import com.saucesubfresh.starter.cache.message.CacheMessageListener;
-import com.saucesubfresh.starter.cache.message.RedisCacheMessageListener;
-import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -21,17 +13,12 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 
 /**
@@ -48,13 +35,8 @@ public class RedisConfig {
     public RedisSerializer<Object> jackson2JsonRedisSerializer() {
         //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-
-        ObjectMapper mapper = new ObjectMapper();
-        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        //必须设置，否则无法将JSON转化为对象，会转化成Map类型
-        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-        mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JsonJacksonCodec jsonJacksonCodec = new JsonJacksonCodec();
+        ObjectMapper mapper = jsonJacksonCodec.getObjectMapper();
         serializer.setObjectMapper(mapper);
         return serializer;
     }
@@ -66,9 +48,7 @@ public class RedisConfig {
         //set key serializer
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringRedisSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-
-        //set value serializer
+        //set default serializer
         template.setDefaultSerializer(jackson2JsonRedisSerializer());
         template.setConnectionFactory(lettuceConnectionFactory);
         template.afterPropertiesSet();

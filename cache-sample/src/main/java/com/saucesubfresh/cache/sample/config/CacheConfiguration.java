@@ -5,10 +5,15 @@ import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.saucesubfresh.starter.cache.executor.CacheExecutor;
+import com.saucesubfresh.starter.cache.factory.ConfigFactory;
 import com.saucesubfresh.starter.cache.handler.CacheListenerErrorHandler;
 import com.saucesubfresh.starter.cache.handler.CacheProducerErrorHandler;
+import com.saucesubfresh.starter.cache.manager.CacheManager;
+import com.saucesubfresh.starter.cache.manager.RedisCaffeineCacheManager;
+import com.saucesubfresh.starter.cache.manager.RedissonCaffeineCacheManager;
 import com.saucesubfresh.starter.cache.message.*;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
+import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +36,13 @@ public class CacheConfiguration {
         properties.put(PropertyKeyConst.SERVER_ADDR, "127.0.0.1:8848");
         return NacosFactory.createNamingService(properties);
     }
+
+//    @Bean
+//    public CacheManager cacheManager(CacheProperties properties,
+//                                     ConfigFactory configFactory,
+//                                     RedisTemplate<String, Object> redisTemplate){
+//        return new RedisCaffeineCacheManager(properties, configFactory, redisTemplate);
+//    }
 
     @Bean
     public CacheMessageProducer cacheMessageProducer(CacheProperties properties,
