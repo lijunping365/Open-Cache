@@ -33,11 +33,11 @@ public class CacheMessageRequest implements Serializable {
     /**
      * The cache key
      */
-    private Object key;
+    private String key;
     /**
      * The cache value
      */
-    private Object value;
+    private String value;
 
 
 }

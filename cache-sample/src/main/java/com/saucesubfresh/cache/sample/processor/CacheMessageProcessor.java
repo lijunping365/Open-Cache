@@ -1,5 +1,6 @@
 package com.saucesubfresh.cache.sample.processor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.domain.CacheNameInfo;
@@ -14,11 +15,10 @@ import com.saucesubfresh.starter.cache.core.ClusterCache;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.redisson.codec.JsonJacksonCodec;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +33,8 @@ public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
 
+    private static final ObjectMapper mapper = new JsonJacksonCodec().getObjectMapper();
+
     public CacheMessageProcessor(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
@@ -46,8 +48,7 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException("the parameter command must not be null");
         }
 
-        Object key = request.getKey();
-        Object value = request.getValue();
+        String key = request.getKey();
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
@@ -61,11 +62,12 @@ public class CacheMessageProcessor implements MessageProcess {
                     request.getCacheNames().forEach(e->cacheManager.getCache(e).preloadCache());
                     break;
                 case UPDATE:
+                    Object value = mapper.readValue(request.getValue(), Object.class);
                     cacheManager.getCache(request.getCacheNames().get(0)).put(key, value);
                     break;
                 case GET:
                     Object o = cacheManager.getCache(request.getCacheNames().get(0)).get(key);
-                    response.setData(Objects.isNull(o) ? null : JSON.toJSON(o));
+                    response.setData(Objects.isNull(o) ? null : mapper.writeValueAsString(o));
                     break;
                 case QUERY_CACHE_NAMES:
                     List<CacheNameInfo> cacheNames = getCacheName();
