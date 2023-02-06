@@ -54,6 +54,8 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_NAMES.getValue());
+        messageBody.setCurrent(reqDTO.getCurrent());
+        messageBody.setPageSize(reqDTO.getPageSize());
         message.setBody(SerializationUtils.serialize(messageBody));
         MessageResponseBody responseBody;
         try {
@@ -87,6 +89,8 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_KEY_SET.getValue());
         messageBody.setCacheNames(Collections.singletonList(reqDTO.getCacheName()));
+        messageBody.setCurrent(reqDTO.getCurrent());
+        messageBody.setPageSize(reqDTO.getPageSize());
         message.setBody(SerializationUtils.serialize(messageBody));
         MessageResponseBody responseBody;
         try {

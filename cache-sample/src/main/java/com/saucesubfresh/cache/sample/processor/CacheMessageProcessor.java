@@ -71,15 +71,16 @@ public class CacheMessageProcessor implements MessageProcess {
                     response.setData(Objects.isNull(o) ? null : mapper.writeValueAsString(o));
                     break;
                 case QUERY_CACHE_NAMES:
-                    List<CacheNameInfo> cacheNames = getCacheName();
+                    List<CacheNameInfo> cacheNames = getCacheName(request);
                     response.setData(JSON.toJSON(cacheNames));
                     break;
-                case QUERY_CACHE_METRICS:
-                    List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
-                    response.setData(JSON.toJSON(cacheMetrics));
                 case QUERY_CACHE_KEY_SET:
-                    Set<Object> keySet = cacheManager.getCache(request.getCacheNames().get(0)).getCacheKeySet();
-                    response.setData(JSON.toJSON(keySet));
+                    List<String> cacheKeySet = getCacheKeys(request);
+                    response.setData(JSON.toJSON(cacheKeySet));
+                    break;
+                case QUERY_CACHE_METRICS:
+                    CacheStatsInfo cacheMetrics = getCacheMetrics(request.getCacheNames().get(0));
+                    response.setData(JSON.toJSON(cacheMetrics));
                     break;
                 default:
                     throw new UnsupportedOperationException("Unsupported Operation");
@@ -90,7 +91,15 @@ public class CacheMessageProcessor implements MessageProcess {
         return SerializationUtils.serialize(response);
     }
 
-    private List<CacheNameInfo> getCacheName(){
+    private List<String> getCacheKeys(CacheMessageRequest request){
+        String cacheName = request.getCacheNames().get(0);
+        Set<Object> cacheKeySet = cacheManager.getCache(cacheName).getCacheKeySet();
+        //进行分页处理
+        return null;
+    }
+
+    private List<CacheNameInfo> getCacheName(CacheMessageRequest request){
+        //进行分页处理
         return cacheManager.getCacheNames().stream().map(e->{
             CacheNameInfo cacheNameInfo = new CacheNameInfo();
             cacheNameInfo.setCacheName(e);
@@ -100,24 +109,16 @@ public class CacheMessageProcessor implements MessageProcess {
         }).collect(Collectors.toList());
     }
 
-    private List<CacheStatsInfo> getCacheMetrics(CacheMessageRequest messageBody){
-        List<String> cacheNames = messageBody.getCacheNames();
-
-        if (CollectionUtils.isEmpty(cacheNames)){
-            return Collections.emptyList();
-        }
-
-        return cacheNames.stream().map(e->{
-            CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
-            cacheStatsInfo.setCacheName(e);
-            final ClusterCache cache = cacheManager.getCache(e);
-            final CacheStats stats = cache.getStats();
-            cacheStatsInfo.setHitCount(stats.getHitCount());
-            cacheStatsInfo.setMissCount(stats.getMissCount());
-            cacheStatsInfo.setRequestCount(stats.requestCount());
-            cacheStatsInfo.setHitRate(stats.hitRate());
-            cacheStatsInfo.setMissRate(stats.missRate());
-            return cacheStatsInfo;
-        }).collect(Collectors.toList());
+    private CacheStatsInfo getCacheMetrics(String cacheName){
+        CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
+        cacheStatsInfo.setCacheName(cacheName);
+        final ClusterCache cache = cacheManager.getCache(cacheName);
+        final CacheStats stats = cache.getStats();
+        cacheStatsInfo.setHitCount(stats.getHitCount());
+        cacheStatsInfo.setMissCount(stats.getMissCount());
+        cacheStatsInfo.setRequestCount(stats.requestCount());
+        cacheStatsInfo.setHitRate(stats.hitRate());
+        cacheStatsInfo.setMissRate(stats.missRate());
+        return cacheStatsInfo;
     }
 }

@@ -18,10 +18,15 @@ import java.util.List;
 @AllArgsConstructor
 public class CacheMessageRequest implements Serializable {
     private static final long serialVersionUID = 6990779922183880977L;
+
     /**
-     * The cache name
+     * The cache key
      */
-    private List<String> cacheNames;
+    private String key;
+    /**
+     * The cache value
+     */
+    private String value;
     /**
      * The message id
      */
@@ -31,13 +36,18 @@ public class CacheMessageRequest implements Serializable {
      */
     private String command;
     /**
-     * The cache key
+     * The page number
      */
-    private String key;
+    private Integer current = 1;
     /**
-     * The cache value
+     * The page size
      */
-    private String value;
+    private Integer pageSize = 10;
+    /**
+     * The cache name
+     */
+    private List<String> cacheNames;
+
 
 
 }
