@@ -21,6 +21,9 @@ public class UserController {
 
     @GetMapping("/load")
     public Result<UserDO> loadUser(@RequestParam Long id){
+        for (int i = 1; i < 10000000; i++) {
+            userService.loadUserById(id);
+        }
         final UserDO userDO = userService.loadUserById(id);
         userService.loadUserById2(id);
         userService.loadUserById3(id);
