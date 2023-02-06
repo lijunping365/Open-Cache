@@ -22,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +77,9 @@ public class CacheMessageProcessor implements MessageProcess {
                 case QUERY_CACHE_METRICS:
                     List<CacheStatsInfo> cacheMetrics = getCacheMetrics(request);
                     response.setData(JSON.toJSON(cacheMetrics));
+                case QUERY_CACHE_KEY_SET:
+                    Set<Object> keySet = cacheManager.getCache(request.getCacheNames().get(0)).getCacheKeySet();
+                    response.setData(JSON.toJSON(keySet));
                     break;
                 default:
                     throw new UnsupportedOperationException("Unsupported Operation");
