@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.admin.controller;
 
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
 import com.saucesubfresh.cache.api.dto.req.*;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheKeyRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.vo.PageResult;
@@ -26,6 +27,11 @@ public class OpenCacheController {
     @GetMapping("/cacheNames")
     public Result<PageResult<OpenCacheNameRespDTO>> cacheNames(OpenCacheNameReqDTO reqDTO) {
         return Result.succeed(openCacheService.cacheNames(reqDTO));
+    }
+
+    @GetMapping("/cacheKeys")
+    public Result<PageResult<OpenCacheKeyRespDTO>> cacheKeys(OpenCacheKeyReqDTO reqDTO) {
+        return Result.succeed(openCacheService.cacheKeys(reqDTO));
     }
 
     @PostMapping("/get")

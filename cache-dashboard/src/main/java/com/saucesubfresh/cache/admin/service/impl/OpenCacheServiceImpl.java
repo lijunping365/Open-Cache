@@ -5,6 +5,7 @@ import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheLogMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
 import com.saucesubfresh.cache.api.dto.req.*;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheKeyRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
@@ -53,6 +54,8 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         message.setNamespace(openCacheAppDO.getAppName());
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_NAMES.getValue());
+        messageBody.setCurrent(reqDTO.getCurrent());
+        messageBody.setPageSize(reqDTO.getPageSize());
         message.setBody(SerializationUtils.serialize(messageBody));
         MessageResponseBody responseBody;
         try {
@@ -74,6 +77,40 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             cacheNameRespDTO.setCacheName(cacheName.getCacheName());
             cacheNameRespDTO.setCacheKeySize(cacheName.getCacheKeySize());
             records.add(cacheNameRespDTO);
+        }
+        return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());
+    }
+
+    @Override
+    public PageResult<OpenCacheKeyRespDTO> cacheKeys(OpenCacheKeyReqDTO reqDTO) {
+        OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(reqDTO.getAppId());
+        Message message = new Message();
+        message.setNamespace(openCacheAppDO.getAppName());
+        CacheMessageRequest messageBody = new CacheMessageRequest();
+        messageBody.setCommand(CacheCommandEnum.QUERY_CACHE_KEY_SET.getValue());
+        messageBody.setCacheNames(Collections.singletonList(reqDTO.getCacheName()));
+        messageBody.setCurrent(reqDTO.getCurrent());
+        messageBody.setPageSize(reqDTO.getPageSize());
+        message.setBody(SerializationUtils.serialize(messageBody));
+        MessageResponseBody responseBody;
+        try {
+            responseBody = doInvoke(message);
+        }catch (RpcException ex){
+            throw new ServiceException(ex.getMessage());
+        }
+
+        byte[] body = responseBody.getBody();
+        CacheMessageResponse response = SerializationUtils.deserialize(body, CacheMessageResponse.class);
+        if (StringUtils.isBlank(response.getData())){
+            return PageResult.<OpenCacheKeyRespDTO>newBuilder().build();
+        }
+
+        List<String> keySet = JSON.parseList(response.getData(), String.class);
+        List<OpenCacheKeyRespDTO> records = new ArrayList<>();
+        for (String key : keySet) {
+            OpenCacheKeyRespDTO cacheKeyRespDTO = new OpenCacheKeyRespDTO();
+            cacheKeyRespDTO.setCacheKey(key);
+            records.add(cacheKeyRespDTO);
         }
         return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());
     }

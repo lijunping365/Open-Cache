@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.admin.service;
 
 import com.saucesubfresh.cache.api.dto.req.*;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheKeyRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.vo.PageResult;
@@ -14,6 +15,11 @@ public interface OpenCacheService {
      * 查询 cacheNames
      */
     PageResult<OpenCacheNameRespDTO> cacheNames(OpenCacheNameReqDTO reqDTO);
+
+    /**
+     * 查询 cacheKeys
+     */
+    PageResult<OpenCacheKeyRespDTO> cacheKeys(OpenCacheKeyReqDTO reqDTO);
 
     /**
      * 二级缓存数据加载到一级缓存

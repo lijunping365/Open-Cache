@@ -43,7 +43,7 @@ public enum CacheCommandEnum {
     QUERY_CACHE_METRICS("query_cache_metrics"),
 
     /**
-     * Query cache keySet
+     * Query cacheKeySet
      */
     QUERY_CACHE_KEY_SET("query_cache_key_set"),
     ;
