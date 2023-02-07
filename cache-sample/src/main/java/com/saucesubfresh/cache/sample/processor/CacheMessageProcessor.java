@@ -82,10 +82,6 @@ public class CacheMessageProcessor implements MessageProcess {
                     CacheStatsInfo cacheMetrics = getCacheMetrics(request.getCacheNames().get(0));
                     response.setData(JSON.toJSON(cacheMetrics));
                     break;
-                case QUERY_CACHE_KEY_SET:
-                    Set<Object> keySet = cacheManager.getCache(request.getCacheNames().get(0)).getCacheKeySet();
-                    response.setData(JSON.toJSON(keySet));
-                    break;
                 default:
                     throw new UnsupportedOperationException("Unsupported Operation");
             }
