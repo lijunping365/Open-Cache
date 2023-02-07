@@ -101,7 +101,7 @@ public class CacheMessageProcessor implements MessageProcess {
         Object[] objects = cacheKeySet.toArray();
 
         //进行分页处理
-        if ((pageNum -1) * pageSize > totalSize){
+        if ((pageNum -1) * pageSize >= totalSize){
             return cacheKeyPageInfo;
         }
         int endIndex = Math.min(totalSize, pageNum * pageSize);
@@ -129,7 +129,7 @@ public class CacheMessageProcessor implements MessageProcess {
         Integer pageSize = request.getPageSize();
         List<String> list = new ArrayList<>(cacheNames);
         //进行分页处理
-        if ((pageNum -1) * pageSize > totalSize){
+        if ((pageNum -1) * pageSize >= totalSize){
             return pageInfo;
         }
         int endIndex = Math.min(totalSize, pageNum * pageSize);
