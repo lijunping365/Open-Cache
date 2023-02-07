@@ -11,6 +11,7 @@ import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.domain.CacheNameInfo;
+import com.saucesubfresh.cache.common.domain.CacheNamePageInfo;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
@@ -24,6 +25,7 @@ import com.saucesubfresh.rpc.core.transport.MessageResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +72,12 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             return PageResult.<OpenCacheNameRespDTO>newBuilder().build();
         }
 
-        List<CacheNameInfo> cacheNames = JSON.parseList(response.getData(), CacheNameInfo.class);
+        CacheNamePageInfo pageInfo = JSON.parse(response.getData(), CacheNamePageInfo.class);
+        List<CacheNameInfo> cacheNames = pageInfo.getCacheNames();
+        Integer totalSize = pageInfo.getTotalSize();
+        if (CollectionUtils.isEmpty(cacheNames)){
+            return PageResult.<OpenCacheNameRespDTO>newBuilder().build();
+        }
         List<OpenCacheNameRespDTO> records = new ArrayList<>();
         for (CacheNameInfo cacheName : cacheNames) {
             OpenCacheNameRespDTO cacheNameRespDTO = new OpenCacheNameRespDTO();
@@ -78,7 +85,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             cacheNameRespDTO.setCacheKeySize(cacheName.getCacheKeySize());
             records.add(cacheNameRespDTO);
         }
-        return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());
+        return PageResult.build(records, totalSize, reqDTO.getCurrent(), reqDTO.getPageSize());
     }
 
     @Override

@@ -1,10 +1,7 @@
 package com.saucesubfresh.cache.sample.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
-import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
-import com.saucesubfresh.cache.common.domain.CacheNameInfo;
-import com.saucesubfresh.cache.common.domain.CacheStatsInfo;
+import com.saucesubfresh.cache.common.domain.*;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.json.JSON;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
@@ -19,10 +16,7 @@ import org.redisson.codec.JsonJacksonCodec;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -71,12 +65,12 @@ public class CacheMessageProcessor implements MessageProcess {
                     response.setData(Objects.isNull(o) ? null : mapper.writeValueAsString(o));
                     break;
                 case QUERY_CACHE_NAMES:
-                    List<CacheNameInfo> cacheNames = getCacheName(request);
-                    response.setData(JSON.toJSON(cacheNames));
+                    CacheNamePageInfo cacheNamePageInfo = getCacheName(request);
+                    response.setData(JSON.toJSON(cacheNamePageInfo));
                     break;
                 case QUERY_CACHE_KEY_SET:
-                    List<String> cacheKeySet = getCacheKeys(request);
-                    response.setData(JSON.toJSON(cacheKeySet));
+                    CacheKeyPageInfo cacheKeyPageInfo = getCacheKeys(request);
+                    response.setData(JSON.toJSON(cacheKeyPageInfo));
                     break;
                 case QUERY_CACHE_METRICS:
                     CacheStatsInfo cacheMetrics = getCacheMetrics(request.getCacheNames().get(0));
@@ -91,22 +85,67 @@ public class CacheMessageProcessor implements MessageProcess {
         return SerializationUtils.serialize(response);
     }
 
-    private List<String> getCacheKeys(CacheMessageRequest request){
+    private CacheKeyPageInfo getCacheKeys(CacheMessageRequest request){
+        CacheKeyPageInfo cacheKeyPageInfo = new CacheKeyPageInfo();
         String cacheName = request.getCacheNames().get(0);
         Set<Object> cacheKeySet = cacheManager.getCache(cacheName).getCacheKeySet();
+        int totalSize = cacheKeySet.size();
+        cacheKeyPageInfo.setTotalSize(totalSize);
+
+        if (CollectionUtils.isEmpty(cacheKeySet)){
+            return cacheKeyPageInfo;
+        }
+
+        Integer pageNum = request.getCurrent();
+        Integer pageSize = request.getPageSize();
+        Object[] objects = cacheKeySet.toArray();
+
         //进行分页处理
-        return null;
+        if ((pageNum -1) * pageSize > totalSize){
+            return cacheKeyPageInfo;
+        }
+        int endIndex = Math.min(totalSize, pageNum * pageSize);
+
+        List<String> cacheKeys = new ArrayList<>();
+        for (int i = (pageNum -1) * pageSize; i < endIndex; i++) {
+            cacheKeys.add((String) objects[0]);
+        }
+        cacheKeyPageInfo.setCacheKeys(cacheKeys);
+        return cacheKeyPageInfo;
     }
 
-    private List<CacheNameInfo> getCacheName(CacheMessageRequest request){
+    private CacheNamePageInfo getCacheName(CacheMessageRequest request){
+        CacheNamePageInfo pageInfo = new CacheNamePageInfo();
+        Collection<String> cacheNames = cacheManager.getCacheNames();
+
+        int totalSize = cacheNames.size();
+        pageInfo.setTotalSize(totalSize);
+
+        if (CollectionUtils.isEmpty(cacheNames)){
+            return pageInfo;
+        }
+
+        Integer pageNum = request.getCurrent();
+        Integer pageSize = request.getPageSize();
+        List<String> list = new ArrayList<>(cacheNames);
         //进行分页处理
-        return cacheManager.getCacheNames().stream().map(e->{
+        if ((pageNum -1) * pageSize > totalSize){
+            return pageInfo;
+        }
+        int endIndex = Math.min(totalSize, pageNum * pageSize);
+
+        List<CacheNameInfo> cacheNameInfos = new ArrayList<>();
+        for (int i = (pageNum -1) * pageSize; i < endIndex; i++) {
+            String cacheName = list.get(i);
             CacheNameInfo cacheNameInfo = new CacheNameInfo();
-            cacheNameInfo.setCacheName(e);
-            final ClusterCache cache = cacheManager.getCache(e);
+            cacheNameInfo.setCacheName(cacheName);
+            final ClusterCache cache = cacheManager.getCache(cacheName);
             cacheNameInfo.setCacheKeySize(cache.getCacheKeyCount());
-            return cacheNameInfo;
-        }).collect(Collectors.toList());
+            cacheNameInfos.add(cacheNameInfo);
+        }
+        pageInfo.setCacheNames(cacheNameInfos);
+        return pageInfo;
+
     }
 
     private CacheStatsInfo getCacheMetrics(String cacheName){
