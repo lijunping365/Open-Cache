@@ -8,10 +8,7 @@ import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheKeyRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
-import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
-import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
-import com.saucesubfresh.cache.common.domain.CacheNameInfo;
-import com.saucesubfresh.cache.common.domain.CacheNamePageInfo;
+import com.saucesubfresh.cache.common.domain.*;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
@@ -112,14 +109,21 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             return PageResult.<OpenCacheKeyRespDTO>newBuilder().build();
         }
 
-        List<String> keySet = JSON.parseList(response.getData(), String.class);
+        CacheKeyPageInfo pageInfo = JSON.parse(response.getData(), CacheKeyPageInfo.class);
+
+        List<String> cacheKeys = pageInfo.getCacheKeys();
+        Integer totalSize = pageInfo.getTotalSize();
+        if (CollectionUtils.isEmpty(cacheKeys)){
+            return PageResult.<OpenCacheKeyRespDTO>newBuilder().build();
+        }
+
         List<OpenCacheKeyRespDTO> records = new ArrayList<>();
-        for (String key : keySet) {
+        for (String key : cacheKeys) {
             OpenCacheKeyRespDTO cacheKeyRespDTO = new OpenCacheKeyRespDTO();
             cacheKeyRespDTO.setCacheKey(key);
             records.add(cacheKeyRespDTO);
         }
-        return PageResult.build(records, records.size(), reqDTO.getCurrent(), reqDTO.getPageSize());
+        return PageResult.build(records, totalSize, reqDTO.getCurrent(), reqDTO.getPageSize());
     }
 
     @Override
