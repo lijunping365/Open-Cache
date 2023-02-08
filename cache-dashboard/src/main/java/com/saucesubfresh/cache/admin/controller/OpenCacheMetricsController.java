@@ -25,11 +25,11 @@ public class OpenCacheMetricsController {
     private OpenCacheMetricsService openCacheMetricsService;
 
     /**
-     * 返回当前某个应用的某个 cacheName 全部节点指标数据
+     * 返回某个应用的某个 cacheName 全部节点指标数据
      */
-    @GetMapping("/current/allNode")
-    public Result<PageResult<OpenCacheMetricsRespDTO>> queryMetrics(OpenCacheMetricsReqDTO reqDTO) {
-        return Result.succeed(openCacheMetricsService.queryMetrics(reqDTO));
+    @GetMapping("/page")
+    public Result<PageResult<OpenCacheMetricsRespDTO>> page(OpenCacheMetricsReqDTO reqDTO) {
+        return Result.succeed(openCacheMetricsService.selectPage(reqDTO));
     }
 
 }

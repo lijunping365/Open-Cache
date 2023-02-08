@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface OpenCacheMetricsService {
 
-    PageResult<OpenCacheMetricsRespDTO> queryMetrics(OpenCacheMetricsReqDTO reqDTO);
+    PageResult<OpenCacheMetricsRespDTO> selectPage(OpenCacheMetricsReqDTO reqDTO);
 }

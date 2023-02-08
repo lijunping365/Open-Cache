@@ -1,5 +1,10 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.saucesubfresh.cache.admin.convert.OpenCacheMetricsConvert;
+import com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO;
+import com.saucesubfresh.cache.admin.mapper.OpenCacheMetricsMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheInstanceService;
 import com.saucesubfresh.cache.admin.service.OpenCacheMetricsService;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheMetricsReqDTO;
@@ -36,14 +41,24 @@ public class OpenCacheMetricsServiceImpl implements OpenCacheMetricsService {
 
     private final RemotingInvoker remotingInvoker;
     private final OpenCacheInstanceService instanceService;
+    private final OpenCacheMetricsMapper metricsMapper;
 
-    public OpenCacheMetricsServiceImpl(RemotingInvoker remotingInvoker, OpenCacheInstanceService instanceService) {
+    public OpenCacheMetricsServiceImpl(RemotingInvoker remotingInvoker,
+                                       OpenCacheInstanceService instanceService,
+                                       OpenCacheMetricsMapper metricsMapper) {
         this.remotingInvoker = remotingInvoker;
         this.instanceService = instanceService;
+        this.metricsMapper = metricsMapper;
     }
 
     @Override
-    public PageResult<OpenCacheMetricsRespDTO> queryMetrics(OpenCacheMetricsReqDTO reqDTO) {
+    public PageResult<OpenCacheMetricsRespDTO> selectPage(OpenCacheMetricsReqDTO reqDTO) {
+        if (!reqDTO.isCurrent()){
+            Page<OpenCacheMetricsDO> page = metricsMapper.queryPage(reqDTO);
+            IPage<OpenCacheMetricsRespDTO> convert = page.convert(OpenCacheMetricsConvert.INSTANCE::convert);
+            return PageResult.build(convert);
+        }
+
         List<OpenCacheInstanceRespDTO> cacheInstance = instanceService.getInstanceList(reqDTO.getAppId());
         if (CollectionUtils.isEmpty(cacheInstance)){
             return PageResult.<OpenCacheMetricsRespDTO>newBuilder().build();
