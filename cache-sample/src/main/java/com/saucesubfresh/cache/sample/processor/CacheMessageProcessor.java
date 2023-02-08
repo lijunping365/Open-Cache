@@ -108,7 +108,7 @@ public class CacheMessageProcessor implements MessageProcess {
 
         List<String> cacheKeys = new ArrayList<>();
         for (int i = (pageNum -1) * pageSize; i < endIndex; i++) {
-            cacheKeys.add((String) objects[0]);
+            cacheKeys.add((String) objects[i]);
         }
         cacheKeyPageInfo.setCacheKeys(cacheKeys);
         return cacheKeyPageInfo;
