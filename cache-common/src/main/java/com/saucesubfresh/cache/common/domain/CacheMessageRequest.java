@@ -20,10 +20,6 @@ public class CacheMessageRequest implements Serializable {
     private static final long serialVersionUID = 6990779922183880977L;
 
     /**
-     * The cache key
-     */
-    private String key;
-    /**
      * The cache value
      */
     private String value;
@@ -35,6 +31,10 @@ public class CacheMessageRequest implements Serializable {
      * The message command
      */
     private String command;
+    /**
+     * The cache key
+     */
+    private List<String> keys;
     /**
      * The page number
      */

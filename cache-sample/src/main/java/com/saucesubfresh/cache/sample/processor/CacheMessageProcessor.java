@@ -43,25 +43,26 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException("the parameter command must not be null");
         }
 
-        String key = request.getKey();
+        List<String> keys = request.getKeys();
+        List<String> cacheNames = request.getCacheNames();
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
                 case CLEAR:
-                    request.getCacheNames().forEach(e-> cacheManager.getCache(e).clear());
+                    cacheNames.forEach(e-> cacheManager.getCache(e).clear());
                     break;
                 case INVALIDATE:
-                    cacheManager.getCache(request.getCacheNames().get(0)).evict(key);
+                    keys.forEach(e-> cacheManager.getCache(cacheNames.get(0)).evict(e));
                     break;
                 case PRELOAD:
-                    request.getCacheNames().forEach(e->cacheManager.getCache(e).preloadCache());
+                    cacheNames.forEach(e->cacheManager.getCache(e).preloadCache());
                     break;
                 case UPDATE:
                     Object value = mapper.readValue(request.getValue(), Object.class);
-                    cacheManager.getCache(request.getCacheNames().get(0)).put(key, value);
+                    cacheManager.getCache(cacheNames.get(0)).put(keys.get(0), value);
                     break;
                 case GET:
-                    Object o = cacheManager.getCache(request.getCacheNames().get(0)).get(key);
+                    Object o = cacheManager.getCache(cacheNames.get(0)).get(keys.get(0));
                     response.setData(Objects.isNull(o) ? null : mapper.writeValueAsString(o));
                     break;
                 case QUERY_CACHE_NAMES:
@@ -73,7 +74,7 @@ public class CacheMessageProcessor implements MessageProcess {
                     response.setData(JSON.toJSON(cacheKeyPageInfo));
                     break;
                 case QUERY_CACHE_METRICS:
-                    CacheStatsInfo cacheMetrics = getCacheMetrics(request.getCacheNames().get(0));
+                    CacheStatsInfo cacheMetrics = getCacheMetrics(cacheNames.get(0));
                     response.setData(JSON.toJSON(cacheMetrics));
                     break;
                 default:

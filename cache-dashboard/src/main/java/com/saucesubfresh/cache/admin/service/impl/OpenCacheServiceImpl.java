@@ -171,7 +171,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
-        messageBody.setKey(request.getKey());
+        messageBody.setKeys(request.getKeys());
         messageBody.setCommand(CacheCommandEnum.INVALIDATE.getValue());
         Message message = new Message();
         message.setNamespace(openCacheAppDO.getAppName());
@@ -192,7 +192,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
-        messageBody.setKey(request.getKey());
+        messageBody.setKeys(Collections.singletonList(request.getKey()));
         messageBody.setValue(request.getValue());
         messageBody.setCommand(CacheCommandEnum.UPDATE.getValue());
         Message message = new Message();
@@ -214,7 +214,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         OpenCacheAppDO openCacheAppDO = openCacheAppMapper.selectById(request.getAppId());
         CacheMessageRequest messageBody = new CacheMessageRequest();
         messageBody.setCacheNames(Collections.singletonList(request.getCacheName()));
-        messageBody.setKey(request.getKey());
+        messageBody.setKeys(Collections.singletonList(request.getKey()));
         messageBody.setCommand(CacheCommandEnum.GET.getValue());
         Message message = new Message();
         message.setNamespace(openCacheAppDO.getAppName());
