@@ -10,6 +10,7 @@ import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
+import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.codec.JsonJacksonCodec;
@@ -26,11 +27,13 @@ import java.util.*;
 public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
+    private final CacheProperties cacheProperties;
 
     private static final ObjectMapper mapper = new JsonJacksonCodec().getObjectMapper();
 
-    public CacheMessageProcessor(CacheManager cacheManager) {
+    public CacheMessageProcessor(CacheManager cacheManager, CacheProperties cacheProperties) {
         this.cacheManager = cacheManager;
+        this.cacheProperties = cacheProperties;
     }
 
     @Override
@@ -154,6 +157,7 @@ public class CacheMessageProcessor implements MessageProcess {
         CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
         final ClusterCache cache = cacheManager.getCache(cacheName);
         final CacheStats stats = cache.getStats();
+        cacheStatsInfo.setInstanceId(cacheProperties.getInstanceId());
         cacheStatsInfo.setHitCount(stats.getHitCount());
         cacheStatsInfo.setMissCount(stats.getMissCount());
         cacheStatsInfo.setRequestCount(stats.requestCount());
