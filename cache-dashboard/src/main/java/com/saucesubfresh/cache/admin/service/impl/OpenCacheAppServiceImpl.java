@@ -14,18 +14,20 @@ import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
 import com.saucesubfresh.cache.common.vo.PageResult;
 import com.saucesubfresh.rpc.client.discovery.ServiceDiscovery;
+import com.saucesubfresh.rpc.client.namespace.NamespaceService;
 import com.saucesubfresh.starter.security.context.UserSecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Service
-public class OpenCacheAppServiceImpl extends ServiceImpl<OpenCacheAppMapper, OpenCacheAppDO> implements OpenCacheAppService {
+public class OpenCacheAppServiceImpl extends ServiceImpl<OpenCacheAppMapper, OpenCacheAppDO> implements OpenCacheAppService, NamespaceService {
 
     private final OpenCacheAppMapper openCacheAppMapper;
     private final ServiceDiscovery serviceDiscovery;
@@ -86,5 +88,14 @@ public class OpenCacheAppServiceImpl extends ServiceImpl<OpenCacheAppMapper, Ope
         }
         List<String> namespaces = openCacheAppDOS.stream().map(OpenCacheAppDO::getAppName).collect(Collectors.toList());
         serviceDiscovery.subscribe(namespaces);
+    }
+
+    @Override
+    public List<String> loadNamespace() {
+        List<OpenCacheAppDO> openCacheAppDOS = openCacheAppMapper.selectList(Wrappers.lambdaQuery());
+        if (CollectionUtils.isEmpty(openCacheAppDOS)){
+            return Collections.emptyList();
+        }
+        return openCacheAppDOS.stream().map(OpenCacheAppDO::getAppName).collect(Collectors.toList());
     }
 }
