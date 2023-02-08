@@ -3,13 +3,16 @@ package com.saucesubfresh.cache.admin.service.impl;
 import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheLogMapper;
+import com.saucesubfresh.cache.admin.service.OpenCacheLogService;
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
+import com.saucesubfresh.cache.api.dto.create.OpenCacheLogCreateDTO;
 import com.saucesubfresh.cache.api.dto.req.*;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheKeyRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheNameRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheValueRespDTO;
 import com.saucesubfresh.cache.common.domain.*;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
+import com.saucesubfresh.cache.common.enums.CommonStatusEnum;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
@@ -24,10 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author lijunping on 2023/1/31
@@ -38,12 +39,12 @@ public class OpenCacheServiceImpl implements OpenCacheService {
 
     private final ClusterInvoker clusterInvoker;
     private final OpenCacheAppMapper openCacheAppMapper;
-    private final OpenCacheLogMapper openCacheLogMapper;
+    private final OpenCacheLogService cacheLogService;
 
-    public OpenCacheServiceImpl(ClusterInvoker clusterInvoker, OpenCacheAppMapper openCacheAppMapper, OpenCacheLogMapper openCacheLogMapper) {
+    public OpenCacheServiceImpl(ClusterInvoker clusterInvoker, OpenCacheAppMapper openCacheAppMapper, OpenCacheLogService cacheLogService) {
         this.clusterInvoker = clusterInvoker;
         this.openCacheAppMapper = openCacheAppMapper;
-        this.openCacheLogMapper = openCacheLogMapper;
+        this.cacheLogService = cacheLogService;
     }
 
     @Override
@@ -142,8 +143,16 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             doInvoke(message);
         }catch (RpcException ex){
             errMsg = ex.getMessage();
+            throw new ServiceException(errMsg);
+        }finally {
+            try {
+                for (String cacheName : request.getCacheNames()) {
+                    recordLog(request.getAppId(), cacheName, CacheCommandEnum.PRELOAD.getValue(), null, null, errMsg);
+                }
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+            }
         }
-        //recordLog(e, response, errMsg);
         return true;
     }
 
@@ -162,8 +171,16 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             doInvoke(message);
         }catch (RpcException ex){
             errMsg = ex.getMessage();
+            throw new ServiceException(errMsg);
+        }finally {
+            try {
+                for (String cacheName : request.getCacheNames()) {
+                    recordLog(request.getAppId(), cacheName, CacheCommandEnum.CLEAR.getValue(), null, null, errMsg);
+                }
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+            }
         }
-        //recordLog(e, response, errMsg);
         return true;
     }
 
@@ -183,8 +200,16 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             doInvoke(message);
         }catch (RpcException ex){
             errMsg = ex.getMessage();
+            throw new ServiceException(errMsg);
+        }finally {
+            try {
+                for (String key : request.getKeys()) {
+                    recordLog(request.getAppId(), request.getCacheName(), CacheCommandEnum.INVALIDATE.getValue(), key, null, errMsg);
+                }
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+            }
         }
-        //recordLog(e, response, errMsg);
         return true;
     }
 
@@ -205,8 +230,10 @@ public class OpenCacheServiceImpl implements OpenCacheService {
             doInvoke(message);
         }catch (RpcException ex){
             errMsg = ex.getMessage();
+            throw new ServiceException(errMsg);
+        }finally {
+            recordLog(request.getAppId(), request.getCacheName(), CacheCommandEnum.UPDATE.getValue(), request.getKey(), request.getValue(), errMsg);
         }
-        //recordLog(e, response, errMsg);
         return true;
     }
 
@@ -220,8 +247,6 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         Message message = new Message();
         message.setNamespace(openCacheAppDO.getAppName());
         message.setBody(SerializationUtils.serialize(messageBody));
-
-
         MessageResponseBody responseBody;
         try {
             responseBody = doInvoke(message);
@@ -231,7 +256,6 @@ public class OpenCacheServiceImpl implements OpenCacheService {
 
         byte[] body = responseBody.getBody();
         CacheMessageResponse response = SerializationUtils.deserialize(body, CacheMessageResponse.class);
-
         OpenCacheValueRespDTO respDTO = new OpenCacheValueRespDTO();
         respDTO.setKey(request.getKey());
         respDTO.setValue(response.getData());
@@ -251,15 +275,17 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         return response;
     }
 
-    private void recordLog(MessageResponseBody response, String cause){
-//        OpenJobLogCreateDTO openJobLogCreateDTO = new OpenJobLogCreateDTO();
-//        String requestId = Optional.ofNullable(response).map(MessageResponseBody::getRequestId).orElse("");
-//        openJobLogCreateDTO.setAppId(jobDO.getAppId());
-//        openJobLogCreateDTO.setJobId(jobDO.getId());
-//        openJobLogCreateDTO.setStatus(StringUtils.isBlank(cause) ? CommonStatusEnum.YES.getValue() : CommonStatusEnum.NO.getValue());
-//        openJobLogCreateDTO.setCause(cause);
-//        openJobLogCreateDTO.setCreateTime(LocalDateTime.now());
-//        JobLogEvent logEvent = new JobLogEvent(this, openJobLogCreateDTO);
-//        openCacheLogMapper.publishEvent(logEvent);
+    private void recordLog(Long appId, String cacheName, String command, String key, String value, String cause){
+        OpenCacheLogCreateDTO logCreateDTO = new OpenCacheLogCreateDTO();
+        logCreateDTO.setAppId(appId);
+        logCreateDTO.setCacheName(cacheName);
+        //logCreateDTO.setInstanceId(cacheName);
+        logCreateDTO.setCommand(command);
+        logCreateDTO.setKey(key);
+        logCreateDTO.setValue(value);
+        logCreateDTO.setStatus(StringUtils.isBlank(cause) ? CommonStatusEnum.YES.getValue() : CommonStatusEnum.NO.getValue());
+        logCreateDTO.setCause(cause);
+        logCreateDTO.setCreateTime(LocalDateTime.now());
+        cacheLogService.save(logCreateDTO);
     }
 }

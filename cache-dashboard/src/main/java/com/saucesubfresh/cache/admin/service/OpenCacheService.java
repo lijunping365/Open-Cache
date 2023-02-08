@@ -44,7 +44,7 @@ public interface OpenCacheService {
     boolean updateCache(OpenCacheUpdateCacheRequest request);
 
     /**
-     * 根据 key 清除
+     * 根据 key 查值
      * @param request
      */
     OpenCacheValueRespDTO getCache(OpenCacheGetCacheRequest request);
