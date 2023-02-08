@@ -20,5 +20,5 @@ public class CacheNameInfo implements Serializable {
     /**
      * 缓存 key size
      */
-    private Integer cacheKeySize;
+    private Long cacheKeySize;
 }

@@ -88,7 +88,9 @@ public class CacheMessageProcessor implements MessageProcess {
     private CacheKeyPageInfo getCacheKeys(CacheMessageRequest request){
         CacheKeyPageInfo cacheKeyPageInfo = new CacheKeyPageInfo();
         String cacheName = request.getCacheNames().get(0);
-        Set<Object> cacheKeySet = cacheManager.getCache(cacheName).getCacheKeySet();
+        String keyPattern = request.getCacheKeyPattern();
+        Integer keyCount = request.getCacheKeyCount();
+        Set<Object> cacheKeySet = cacheManager.getCache(cacheName).getCacheKeySet(keyPattern, keyCount);
         int totalSize = cacheKeySet.size();
         cacheKeyPageInfo.setTotalSize(totalSize);
 
