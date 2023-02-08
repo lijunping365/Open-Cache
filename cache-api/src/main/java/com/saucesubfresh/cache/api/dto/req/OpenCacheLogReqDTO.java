@@ -17,14 +17,10 @@ import java.time.LocalDateTime;
 public class OpenCacheLogReqDTO extends DateTimePageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-
-    private Long appId;
-
     /**
-     * 缓存实例 id
+     * 应用 id
      */
-    private String instanceId;
+    private Long appId;
 
     /**
      * 缓存名称
@@ -37,11 +33,6 @@ public class OpenCacheLogReqDTO extends DateTimePageQuery implements Serializabl
     private String key;
 
     /**
-     * 缓存 value
-     */
-    private String value;
-
-    /**
      * 命令类型
      */
     private String command;
@@ -50,10 +41,5 @@ public class OpenCacheLogReqDTO extends DateTimePageQuery implements Serializabl
      * 执行状态
      */
     private Integer status;
-
-    /**
-     * 执行时间
-     */
-    private LocalDateTime createTime;
 
 }
