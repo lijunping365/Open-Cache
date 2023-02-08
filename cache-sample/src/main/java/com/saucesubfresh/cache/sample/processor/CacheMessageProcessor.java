@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author lijunping on 2022/2/25
@@ -153,7 +152,6 @@ public class CacheMessageProcessor implements MessageProcess {
 
     private CacheStatsInfo getCacheMetrics(String cacheName){
         CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
-        cacheStatsInfo.setCacheName(cacheName);
         final ClusterCache cache = cacheManager.getCache(cacheName);
         final CacheStats stats = cache.getStats();
         cacheStatsInfo.setHitCount(stats.getHitCount());
