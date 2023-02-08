@@ -26,4 +26,9 @@ public class OpenCacheKeyReqDTO extends PageQuery implements Serializable {
      */
     private String cacheName;
 
+    /**
+     * cacheKey 模糊查询匹配规则，例如 *loadUserById*，loadUserById*，*loadUserById
+     */
+    private String keyPattern;
+
 }

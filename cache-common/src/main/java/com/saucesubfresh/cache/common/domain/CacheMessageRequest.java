@@ -44,7 +44,7 @@ public class CacheMessageRequest implements Serializable {
      */
     private Integer pageSize = 10;
     /**
-     * 查询 cacheKey 匹配规则
+     * cacheKey 模糊查询匹配规则，例如 *loadUserById*，loadUserById*，*loadUserById
      */
     private String cacheKeyPattern;
     /**

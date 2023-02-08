@@ -95,6 +95,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         messageBody.setCacheNames(Collections.singletonList(reqDTO.getCacheName()));
         messageBody.setCurrent(reqDTO.getCurrent());
         messageBody.setPageSize(reqDTO.getPageSize());
+        messageBody.setCacheKeyPattern(reqDTO.getKeyPattern());
         message.setBody(SerializationUtils.serialize(messageBody));
         MessageResponseBody responseBody;
         try {
