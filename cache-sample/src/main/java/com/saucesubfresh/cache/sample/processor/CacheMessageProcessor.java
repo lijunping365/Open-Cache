@@ -62,14 +62,14 @@ public class CacheMessageProcessor implements MessageProcess {
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
-                case PRELOAD:
-                    preloadCache(cacheNames);
-                    break;
                 case CLEAR:
                     handlerCacheClear(cacheNames);
                     break;
                 case INVALIDATE:
                     handlerCacheEvict(cacheNames.get(0), keys);
+                    break;
+                case PRELOAD:
+                    preloadCache(cacheNames, request.getCacheKeyCount());
                     break;
                 case UPDATE:
                     Object value = mapper.readValue(request.getValue(), Object.class);
@@ -100,10 +100,10 @@ public class CacheMessageProcessor implements MessageProcess {
         return SerializationUtils.serialize(response);
     }
 
-    private void preloadCache(List<String> cacheNames){
+    private void preloadCache(List<String> cacheNames, int count){
         cacheNames.forEach(e->{
             try {
-                cacheManager.getCache(e).preloadCache();
+                cacheManager.getCache(e).preloadCache(count);
                 CacheMessage cacheMessage = CacheMessage.builder().cacheName(e).command(CacheCommand.PRELOAD).build();
                 messageProducer.broadcastLocalCacheStore(cacheMessage);
             }catch (Exception ex){
