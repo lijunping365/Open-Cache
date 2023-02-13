@@ -1,8 +1,12 @@
 package com.saucesubfresh.cache.sample.service.impl;
 
 import com.saucesubfresh.cache.sample.domain.UserDO;
+import com.saucesubfresh.cache.sample.mapper.UserMapper;
 import com.saucesubfresh.cache.sample.service.UserService;
+import com.saucesubfresh.starter.cache.annotation.OpenCacheEvict;
+import com.saucesubfresh.starter.cache.annotation.OpenCachePut;
 import com.saucesubfresh.starter.cache.annotation.OpenCacheable;
+import com.saucesubfresh.starter.cache.processor.CacheProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +16,29 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    private final UserMapper userMapper;
+    private final CacheProcessor cacheProcessor;
+
+
+    public UserServiceImpl(CacheProcessor cacheProcessor, UserMapper userMapper) {
+        this.cacheProcessor = cacheProcessor;
+        this.userMapper = userMapper;
+    }
+
+    /**
+     * 此处演示在更新数据时为了保持 mysql 和 缓存数据的一致性所采取的方案抉择：
+     *
+     * 1. 先更新 MySQL，再更新 Redis，这种方案极不推荐使用
+     *
+     * 1. 先更新 MySQL，再删除 Redis，推荐使用该方案
+     */
+    //@OpenCachePut // 不推荐使用
+    @OpenCacheEvict(cacheName = "test", key = "#userDO.id") // 推荐使用该方案
+    @Override
+    public void updateUser(UserDO userDO) {
+        userMapper.update(userDO);
+    }
 
     @OpenCacheable(cacheName = "test", key = "#id")
     @Override
