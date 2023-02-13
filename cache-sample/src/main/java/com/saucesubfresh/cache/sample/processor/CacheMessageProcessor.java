@@ -9,7 +9,12 @@ import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
+import com.saucesubfresh.starter.cache.exception.CacheExecuteException;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
+import com.saucesubfresh.starter.cache.message.CacheCommand;
+import com.saucesubfresh.starter.cache.message.CacheMessage;
+import com.saucesubfresh.starter.cache.message.CacheMessageProducer;
+import com.saucesubfresh.starter.cache.processor.CacheProcessor;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +32,20 @@ import java.util.*;
 public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
+    private final CacheProcessor cacheProcessor;
     private final CacheProperties cacheProperties;
+    private final CacheMessageProducer messageProducer;
 
     private static final ObjectMapper mapper = new JsonJacksonCodec().getObjectMapper();
 
-    public CacheMessageProcessor(CacheManager cacheManager, CacheProperties cacheProperties) {
+    public CacheMessageProcessor(CacheManager cacheManager,
+                                 CacheProcessor cacheProcessor,
+                                 CacheProperties cacheProperties,
+                                 CacheMessageProducer messageProducer) {
         this.cacheManager = cacheManager;
+        this.cacheProcessor = cacheProcessor;
         this.cacheProperties = cacheProperties;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -50,18 +62,18 @@ public class CacheMessageProcessor implements MessageProcess {
         CacheMessageResponse response = new CacheMessageResponse();
         try {
             switch (command){
+                case PRELOAD:
+                    preloadCache(cacheNames);
+                    break;
                 case CLEAR:
-                    cacheNames.forEach(e-> cacheManager.getCache(e).clear());
+                    handlerCacheClear(cacheNames);
                     break;
                 case INVALIDATE:
-                    keys.forEach(e-> cacheManager.getCache(cacheNames.get(0)).evict(e));
-                    break;
-                case PRELOAD:
-                    cacheNames.forEach(e->cacheManager.getCache(e).preloadCache());
+                    handlerCacheEvict(cacheNames.get(0), keys);
                     break;
                 case UPDATE:
                     Object value = mapper.readValue(request.getValue(), Object.class);
-                    cacheManager.getCache(cacheNames.get(0)).put(keys.get(0), value);
+                    handlerCachePut(cacheNames.get(0), keys.get(0), value);
                     break;
                 case GET:
                     Object o = cacheManager.getCache(cacheNames.get(0)).get(keys.get(0));
@@ -86,6 +98,46 @@ public class CacheMessageProcessor implements MessageProcess {
             throw new RpcException(e.getMessage());
         }
         return SerializationUtils.serialize(response);
+    }
+
+    private void preloadCache(List<String> cacheNames){
+        cacheNames.forEach(e->{
+            try {
+                cacheManager.getCache(e).preloadCache();
+                CacheMessage cacheMessage = CacheMessage.builder().cacheName(e).command(CacheCommand.PRELOAD).build();
+                messageProducer.broadcastLocalCacheStore(cacheMessage);
+            }catch (Exception ex){
+                throw new CacheExecuteException("Preload cache occur exception with cacheName: " + e + ",the cause is " + ex.getMessage());
+            }
+        });
+    }
+
+    private void handlerCachePut(String cacheName, String cacheKey, Object value){
+        try {
+            cacheProcessor.handlerCachePut(cacheName, cacheKey, value);
+        } catch (Throwable e) {
+            throw new CacheExecuteException("Update cache occur exception with cacheName: " + cacheName + "cacheKey: "+ cacheKey + ",the cause is " + e.getMessage());
+        }
+    }
+
+    private void handlerCacheEvict(String cacheName, List<String> keys){
+        keys.forEach(e-> {
+            try {
+                cacheProcessor.handlerCacheEvict(cacheName,e);
+            } catch (Throwable ex) {
+                throw new CacheExecuteException("Evict cache occur exception with cacheName: " + cacheName + "cacheKey: "+ e + ",the cause is " +ex.getMessage());
+            }
+        });
+    }
+
+    private void handlerCacheClear(List<String> cacheNames){
+        cacheNames.forEach(e-> {
+            try {
+                cacheProcessor.handlerCacheClear(e);
+            } catch (Throwable ex) {
+                throw new CacheExecuteException("Clear cache occur exception with cacheName: " + e + ",the cause is " +ex.getMessage());
+            }
+        });
     }
 
     private CacheKeyPageInfo getCacheKeys(CacheMessageRequest request){
