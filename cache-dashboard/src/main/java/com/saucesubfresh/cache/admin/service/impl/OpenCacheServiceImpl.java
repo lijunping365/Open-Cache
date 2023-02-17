@@ -79,6 +79,8 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         List<OpenCacheNameRespDTO> records = new ArrayList<>();
         for (CacheNameInfo cacheName : cacheNames) {
             OpenCacheNameRespDTO cacheNameRespDTO = new OpenCacheNameRespDTO();
+            cacheNameRespDTO.setTtl(cacheName.getTtl());
+            cacheNameRespDTO.setMaxSize(cacheName.getMaxSize());
             cacheNameRespDTO.setCacheName(cacheName.getCacheName());
             cacheNameRespDTO.setCacheKeySize(cacheName.getCacheKeySize());
             records.add(cacheNameRespDTO);

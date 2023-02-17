@@ -10,6 +10,8 @@ import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.server.process.MessageProcess;
 import com.saucesubfresh.starter.cache.core.ClusterCache;
 import com.saucesubfresh.starter.cache.exception.CacheExecuteException;
+import com.saucesubfresh.starter.cache.factory.CacheConfig;
+import com.saucesubfresh.starter.cache.factory.ConfigFactory;
 import com.saucesubfresh.starter.cache.manager.CacheManager;
 import com.saucesubfresh.starter.cache.message.CacheCommand;
 import com.saucesubfresh.starter.cache.message.CacheMessage;
@@ -32,6 +34,7 @@ import java.util.*;
 public class CacheMessageProcessor implements MessageProcess {
 
     private final CacheManager cacheManager;
+    private final ConfigFactory configFactory;
     private final CacheProcessor cacheProcessor;
     private final CacheProperties cacheProperties;
     private final CacheMessageProducer messageProducer;
@@ -39,10 +42,12 @@ public class CacheMessageProcessor implements MessageProcess {
     private static final ObjectMapper mapper = new JsonJacksonCodec().getObjectMapper();
 
     public CacheMessageProcessor(CacheManager cacheManager,
+                                 ConfigFactory configFactory,
                                  CacheProcessor cacheProcessor,
                                  CacheProperties cacheProperties,
                                  CacheMessageProducer messageProducer) {
         this.cacheManager = cacheManager;
+        this.configFactory = configFactory;
         this.cacheProcessor = cacheProcessor;
         this.cacheProperties = cacheProperties;
         this.messageProducer = messageProducer;
@@ -196,8 +201,11 @@ public class CacheMessageProcessor implements MessageProcess {
             String cacheName = list.get(i);
             CacheNameInfo cacheNameInfo = new CacheNameInfo();
             cacheNameInfo.setCacheName(cacheName);
-            final ClusterCache cache = cacheManager.getCache(cacheName);
+            ClusterCache cache = cacheManager.getCache(cacheName);
+            CacheConfig cacheConfig = configFactory.create(cacheName);
             cacheNameInfo.setCacheKeySize(cache.getCacheKeyCount());
+            cacheNameInfo.setTtl(cacheConfig.getTtl());
+            cacheNameInfo.setMaxSize(cacheConfig.getMaxSize());
             cacheNameInfos.add(cacheNameInfo);
         }
         pageInfo.setCacheNames(cacheNameInfos);
