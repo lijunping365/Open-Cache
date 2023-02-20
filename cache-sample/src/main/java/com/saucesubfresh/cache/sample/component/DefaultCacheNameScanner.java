@@ -10,13 +10,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author: 李俊平
@@ -24,11 +22,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
-public class DefaultCacheNameHolder implements CacheNameHolder, ApplicationContextAware, InitializingBean {
+public class DefaultCacheNameScanner implements CacheNameScanner, ApplicationContextAware, InitializingBean {
 
     protected final Set<String> cacheNames = new HashSet<>();
 
     private ApplicationContext applicationContext;
+
+    @Override
+    public Set<String> loadCacheNames() {
+        return cacheNames;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -83,5 +86,4 @@ public class DefaultCacheNameHolder implements CacheNameHolder, ApplicationConte
 
         cacheNames.add(name);
     }
-
 }

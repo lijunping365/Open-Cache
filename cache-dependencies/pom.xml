@@ -33,8 +33,8 @@
         <open-starter-captcha.version>1.0.3</open-starter-captcha.version>
         <open-starter-oauth.version>1.0.4</open-starter-oauth.version>
         <open-starter-security.version>1.0.4</open-starter-security.version>
+        <open-starter-cache.version>1.0.4</open-starter-cache.version>
         <open-starter-alarm.version>1.0.2</open-starter-alarm.version>
-        <open-starter-cache.version>1.0.3</open-starter-cache.version>
         <!-- grpc -->
         <grpc.version>1.41.0</grpc.version>
         <!-- nacos -->
