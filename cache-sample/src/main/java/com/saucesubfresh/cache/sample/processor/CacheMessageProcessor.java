@@ -178,7 +178,9 @@ public class CacheMessageProcessor implements MessageProcess {
 
     private CacheNamePageInfo getCacheName(CacheMessageRequest request){
         CacheNamePageInfo pageInfo = new CacheNamePageInfo();
-        Collection<String> cacheNames = cacheManager.getCacheNames();
+        Map<String, CacheConfig> cacheConfigMap = configFactory.getCacheConfig();
+
+        Collection<String> cacheNames = cacheConfigMap.keySet();
 
         int totalSize = cacheNames.size();
         pageInfo.setTotalSize(totalSize);
@@ -202,10 +204,9 @@ public class CacheMessageProcessor implements MessageProcess {
             CacheNameInfo cacheNameInfo = new CacheNameInfo();
             cacheNameInfo.setCacheName(cacheName);
             ClusterCache cache = cacheManager.getCache(cacheName);
-            CacheConfig cacheConfig = configFactory.create(cacheName);
             cacheNameInfo.setCacheKeySize(cache.getCacheKeyCount());
-            cacheNameInfo.setTtl(cacheConfig.getTtl());
-            cacheNameInfo.setMaxSize(cacheConfig.getMaxSize());
+            cacheNameInfo.setTtl(cacheConfigMap.get(cacheName).getTtl());
+            cacheNameInfo.setMaxSize(cacheConfigMap.get(cacheName).getMaxSize());
             cacheNameInfos.add(cacheNameInfo);
         }
         pageInfo.setCacheNames(cacheNameInfos);
