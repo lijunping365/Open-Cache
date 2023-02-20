@@ -1,3 +1,4 @@
 test:
   ttl: 1800
   maxSize: 10
+  allowNullValues: true

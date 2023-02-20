@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.TypedJsonJacksonCodec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -72,7 +73,7 @@ public class RedisConfig {
         if (StringUtils.isNotBlank(properties.getPassword())) {
             singleServerConfig.setPassword(properties.getPassword());
         }
-        config.setCodec(new JsonJacksonCodec());
+        config.setCodec(new TypedJsonJacksonCodec(Object.class));
 
         return Redisson.create(config);
     }
