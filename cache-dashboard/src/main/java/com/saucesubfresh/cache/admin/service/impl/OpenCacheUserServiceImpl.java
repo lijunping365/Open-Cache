@@ -17,6 +17,8 @@ import com.saucesubfresh.starter.oauth.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 
 @Service
 public class OpenCacheUserServiceImpl extends ServiceImpl<OpenCacheUserMapper, OpenCacheUserDO> implements OpenCacheUserService, UserDetailService {
@@ -74,6 +76,9 @@ public class OpenCacheUserServiceImpl extends ServiceImpl<OpenCacheUserMapper, O
     }
 
     private UserDetails convert(OpenCacheUserDO openCacheUserDO){
+        if (Objects.isNull(openCacheUserDO)){
+            return null;
+        }
         UserDetails userDetails = new UserDetails();
         userDetails.setId(openCacheUserDO.getId());
         userDetails.setUsername(openCacheUserDO.getUsername());
