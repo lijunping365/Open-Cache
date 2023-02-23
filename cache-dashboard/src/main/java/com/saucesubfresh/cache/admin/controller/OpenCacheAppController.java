@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.admin.controller;
 
 import com.saucesubfresh.cache.api.dto.create.OpenCacheAppCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheAppReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheAppRespDTO;
 import com.saucesubfresh.cache.api.dto.update.OpenCacheAppUpdateDTO;
@@ -55,9 +56,9 @@ public class OpenCacheAppController {
     return Result.succeed(openCacheAppService.updateById(openCacheAppUpdateDTO));
   }
 
-  @PutMapping("/delete/{id}")
-  public Result<Boolean> delete(@PathVariable("id") Long id) {
-    return Result.succeed(openCacheAppService.deleteById(id));
+  @DeleteMapping("/delete")
+  public Result<Boolean> delete(@RequestBody @Valid DeleteDTO deleteDTO) {
+    return Result.succeed(openCacheAppService.deleteBatchIds(deleteDTO));
   }
 
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saucesubfresh.cache.admin.convert.OpenCacheLogConvert;
 import com.saucesubfresh.cache.api.dto.create.OpenCacheLogCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheLogReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheLogRespDTO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheLogDO;
@@ -40,8 +41,8 @@ public class OpenCacheLogServiceImpl extends ServiceImpl<OpenCacheLogMapper, Ope
     }
 
     @Override
-    public boolean deleteById(Long id) {
-        openCacheLogMapper.deleteById(id);
+    public boolean deleteBatchIds(DeleteDTO deleteDTO) {
+        openCacheLogMapper.deleteBatchIds(deleteDTO.getIds());
         return true;
     }
 }

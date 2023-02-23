@@ -1,5 +1,6 @@
 package com.saucesubfresh.cache.admin.controller;
 
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheLogReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheLogRespDTO;
 import com.saucesubfresh.cache.admin.service.OpenCacheLogService;
@@ -8,6 +9,8 @@ import com.saucesubfresh.cache.common.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 
 /**
@@ -35,9 +38,9 @@ public class OpenCacheLogController {
     return Result.succeed(openCacheLogService.getById(id));
   }
 
-  @PutMapping("/delete/{id}")
-  public Result<Boolean> delete(@PathVariable("id") Long id) {
-    return Result.succeed(openCacheLogService.deleteById(id));
+  @DeleteMapping("/delete")
+  public Result<Boolean> delete(@RequestBody @Valid DeleteDTO deleteDTO) {
+    return Result.succeed(openCacheLogService.deleteBatchIds(deleteDTO));
   }
 
 }

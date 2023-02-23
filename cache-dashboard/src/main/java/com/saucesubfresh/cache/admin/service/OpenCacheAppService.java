@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.admin.service;
 
 import com.saucesubfresh.cache.api.dto.create.OpenCacheAppCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheAppReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheAppRespDTO;
 import com.saucesubfresh.cache.api.dto.update.OpenCacheAppUpdateDTO;
@@ -25,7 +26,7 @@ public interface OpenCacheAppService {
 
     boolean updateById(OpenCacheAppUpdateDTO openCacheAppUpdateDTO);
 
-    boolean deleteById(Long id);
+    boolean deleteBatchIds(DeleteDTO deleteDTO);
 
     List<OpenCacheAppRespDTO> queryList(String appName);
 }

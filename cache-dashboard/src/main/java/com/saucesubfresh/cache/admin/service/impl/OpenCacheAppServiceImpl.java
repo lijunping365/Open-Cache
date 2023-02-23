@@ -9,6 +9,7 @@ import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheAppService;
 import com.saucesubfresh.cache.api.dto.create.OpenCacheAppCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheAppReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheAppRespDTO;
 import com.saucesubfresh.cache.api.dto.update.OpenCacheAppUpdateDTO;
@@ -65,8 +66,8 @@ public class OpenCacheAppServiceImpl extends ServiceImpl<OpenCacheAppMapper, Ope
     }
 
     @Override
-    public boolean deleteById(Long id) {
-        openCacheAppMapper.deleteById(id);
+    public boolean deleteBatchIds(DeleteDTO deleteDTO) {
+        openCacheAppMapper.deleteBatchIds(deleteDTO.getIds());
         this.refreshSubscribeList();
         return true;
     }

@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.admin.service;
 
 
 import com.saucesubfresh.cache.api.dto.create.OpenCacheLogCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheLogReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheLogRespDTO;
 import com.saucesubfresh.cache.common.vo.PageResult;
@@ -21,6 +22,6 @@ public interface OpenCacheLogService {
 
     void save(OpenCacheLogCreateDTO OpenCacheLogCreateDTO);
 
-    boolean deleteById(Long id);
+    boolean deleteBatchIds(DeleteDTO deleteDTO);
 }
 
