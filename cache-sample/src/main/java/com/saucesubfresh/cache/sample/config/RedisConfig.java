@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
-import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.codec.TypedJsonJacksonCodec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
@@ -36,7 +35,7 @@ public class RedisConfig {
     public RedisSerializer<Object> jackson2JsonRedisSerializer() {
         //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        JsonJacksonCodec jsonJacksonCodec = new JsonJacksonCodec();
+        TypedJsonJacksonCodec jsonJacksonCodec = new TypedJsonJacksonCodec(Object.class, Object.class);
         ObjectMapper mapper = jsonJacksonCodec.getObjectMapper();
         serializer.setObjectMapper(mapper);
         return serializer;
@@ -73,7 +72,7 @@ public class RedisConfig {
         if (StringUtils.isNotBlank(properties.getPassword())) {
             singleServerConfig.setPassword(properties.getPassword());
         }
-        config.setCodec(new TypedJsonJacksonCodec(Object.class));
+        config.setCodec(new TypedJsonJacksonCodec(Object.class, Object.class));
 
         return Redisson.create(config);
     }
