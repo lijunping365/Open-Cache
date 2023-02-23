@@ -2,8 +2,6 @@ package com.saucesubfresh.cache.admin.service.impl;
 
 import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
-import com.saucesubfresh.cache.admin.mapper.OpenCacheLogMapper;
-import com.saucesubfresh.cache.admin.service.OpenCacheLogService;
 import com.saucesubfresh.cache.admin.service.OpenCacheService;
 import com.saucesubfresh.cache.api.dto.create.OpenCacheLogCreateDTO;
 import com.saucesubfresh.cache.api.dto.req.*;
@@ -17,6 +15,7 @@ import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
 import com.saucesubfresh.cache.common.vo.PageResult;
+import com.saucesubfresh.cache.event.CacheLogEvent;
 import com.saucesubfresh.rpc.client.cluster.ClusterInvoker;
 import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.enums.ResponseStatus;
@@ -24,11 +23,15 @@ import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.core.transport.MessageResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author lijunping on 2023/1/31
@@ -39,12 +42,14 @@ public class OpenCacheServiceImpl implements OpenCacheService {
 
     private final ClusterInvoker clusterInvoker;
     private final OpenCacheAppMapper openCacheAppMapper;
-    private final OpenCacheLogService cacheLogService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public OpenCacheServiceImpl(ClusterInvoker clusterInvoker, OpenCacheAppMapper openCacheAppMapper, OpenCacheLogService cacheLogService) {
+    public OpenCacheServiceImpl(ClusterInvoker clusterInvoker,
+                                OpenCacheAppMapper openCacheAppMapper,
+                                ApplicationEventPublisher eventPublisher) {
         this.clusterInvoker = clusterInvoker;
         this.openCacheAppMapper = openCacheAppMapper;
-        this.cacheLogService = cacheLogService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -288,6 +293,7 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         logCreateDTO.setStatus(StringUtils.isBlank(cause) ? CommonStatusEnum.YES.getValue() : CommonStatusEnum.NO.getValue());
         logCreateDTO.setCause(cause);
         logCreateDTO.setCreateTime(LocalDateTime.now());
-        cacheLogService.save(logCreateDTO);
+        CacheLogEvent logEvent = new CacheLogEvent(this, logCreateDTO);
+        eventPublisher.publishEvent(logEvent);
     }
 }
