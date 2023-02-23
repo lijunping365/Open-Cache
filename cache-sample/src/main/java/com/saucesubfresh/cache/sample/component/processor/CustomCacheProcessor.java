@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
+ * 主要为解决缓存值序列化问题而做
  * @author lijunping
  */
 @Slf4j
