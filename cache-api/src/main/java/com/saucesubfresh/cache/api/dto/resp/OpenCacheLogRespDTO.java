@@ -32,11 +32,11 @@ public class OpenCacheLogRespDTO implements Serializable {
     /**
      * 缓存 key
      */
-    private String key;
+    private String cacheKey;
     /**
      * 缓存 value
      */
-    private String value;
+    private String cacheValue;
     /**
      * 命令类型
      */

@@ -288,8 +288,8 @@ public class OpenCacheServiceImpl implements OpenCacheService {
         logCreateDTO.setCacheName(cacheName);
         //logCreateDTO.setInstanceId(cacheName);
         logCreateDTO.setCommand(command);
-        logCreateDTO.setKey(key);
-        logCreateDTO.setValue(value);
+        logCreateDTO.setCacheKey(key);
+        logCreateDTO.setCacheValue(value);
         logCreateDTO.setStatus(StringUtils.isBlank(cause) ? CommonStatusEnum.YES.getValue() : CommonStatusEnum.NO.getValue());
         logCreateDTO.setCause(cause);
         logCreateDTO.setCreateTime(LocalDateTime.now());

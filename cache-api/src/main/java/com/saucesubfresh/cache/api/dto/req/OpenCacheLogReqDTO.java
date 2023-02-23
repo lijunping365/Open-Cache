@@ -30,7 +30,7 @@ public class OpenCacheLogReqDTO extends DateTimePageQuery implements Serializabl
     /**
      * 缓存 key
      */
-    private String key;
+    private String cacheKey;
 
     /**
      * 命令类型

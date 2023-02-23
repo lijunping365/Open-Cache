@@ -23,7 +23,7 @@ public interface OpenCacheLogMapper extends BaseMapper<OpenCacheLogDO> {
         return selectPage(openCacheLogReqDTO.page(), Wrappers.<OpenCacheLogDO>lambdaQuery()
             .eq(Objects.nonNull(openCacheLogReqDTO.getAppId()), OpenCacheLogDO::getAppId, openCacheLogReqDTO.getAppId())
             .eq(Objects.nonNull(openCacheLogReqDTO.getCacheName()), OpenCacheLogDO::getCacheName, openCacheLogReqDTO.getCacheName())
-            .eq(Objects.nonNull(openCacheLogReqDTO.getKey()), OpenCacheLogDO::getKey, openCacheLogReqDTO.getKey())
+            .eq(Objects.nonNull(openCacheLogReqDTO.getCacheKey()), OpenCacheLogDO::getCacheKey, openCacheLogReqDTO.getCacheKey())
             .eq(Objects.nonNull(openCacheLogReqDTO.getCommand()), OpenCacheLogDO::getCommand, openCacheLogReqDTO.getCommand())
             .eq(Objects.nonNull(openCacheLogReqDTO.getStatus()), OpenCacheLogDO::getStatus, openCacheLogReqDTO.getStatus())
             .between(Objects.nonNull(openCacheLogReqDTO.getBeginTime()), OpenCacheLogDO::getCreateTime, openCacheLogReqDTO.getBeginTime(), openCacheLogReqDTO.getEndTime())
