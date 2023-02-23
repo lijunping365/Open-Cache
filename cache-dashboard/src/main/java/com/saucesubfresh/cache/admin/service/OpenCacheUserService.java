@@ -2,6 +2,7 @@ package com.saucesubfresh.cache.admin.service;
 
 
 import com.saucesubfresh.cache.api.dto.create.OpenCacheUserCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheUserReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheUserRespDTO;
 import com.saucesubfresh.cache.api.dto.update.OpenCacheUserUpdateDTO;
@@ -24,7 +25,7 @@ public interface OpenCacheUserService {
 
     boolean updateById(OpenCacheUserUpdateDTO openCacheUserUpdateDTO);
 
-    boolean deleteById(Long id);
+    boolean deleteBatchIds(DeleteDTO deleteDTO);
 
     OpenCacheUserRespDTO loadUserByUserId(Long userId);
 }

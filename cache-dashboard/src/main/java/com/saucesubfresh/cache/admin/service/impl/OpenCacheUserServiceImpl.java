@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saucesubfresh.cache.admin.convert.OpenCacheUserConvert;
 import com.saucesubfresh.cache.api.dto.create.OpenCacheUserCreateDTO;
+import com.saucesubfresh.cache.api.dto.del.DeleteDTO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheUserReqDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheUserRespDTO;
 import com.saucesubfresh.cache.api.dto.update.OpenCacheUserUpdateDTO;
@@ -52,8 +53,8 @@ public class OpenCacheUserServiceImpl extends ServiceImpl<OpenCacheUserMapper, O
     }
 
     @Override
-    public boolean deleteById(Long id) {
-        openCacheUserMapper.deleteById(id);
+    public boolean deleteBatchIds(DeleteDTO deleteDTO) {
+        openCacheUserMapper.deleteBatchIds(deleteDTO.getIds());
         return true;
     }
 
