@@ -20,7 +20,7 @@ import com.saucesubfresh.starter.cache.processor.CacheProcessor;
 import com.saucesubfresh.starter.cache.properties.CacheProperties;
 import com.saucesubfresh.starter.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -39,7 +39,7 @@ public class CacheMessageProcessor implements MessageProcess {
     private final CacheProperties cacheProperties;
     private final CacheMessageProducer messageProducer;
 
-    private static final ObjectMapper mapper = new JsonJacksonCodec().getObjectMapper();
+    private static final ObjectMapper mapper = new TypedJsonJacksonCodec(Object.class, Object.class).getObjectMapper();
 
     public CacheMessageProcessor(CacheManager cacheManager,
                                  ConfigFactory configFactory,
