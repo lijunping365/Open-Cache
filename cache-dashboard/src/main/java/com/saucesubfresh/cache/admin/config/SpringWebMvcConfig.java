@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Properties;
 
@@ -18,7 +20,7 @@ import java.util.Properties;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @Import({JacksonCustomizerConfiguration.class, CorsConfig.class})
-public class SpringWebMvcConfig {
+public class SpringWebMvcConfig implements WebMvcConfigurer {
 
     /**
      * Spring Web Mvc 的全局异常，全局返回结果处理
@@ -41,5 +43,10 @@ public class SpringWebMvcConfig {
         properties.put(PropertyKeyConst.PASSWORD, "nacos");
         properties.put(PropertyKeyConst.SERVER_ADDR, "127.0.0.1:8848");
         return NacosFactory.createNamingService(properties);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/","classpath:/templates/");
     }
 }

@@ -68,6 +68,11 @@ com:
       ignore-paths:
         - "/captcha/**"
         - "/login/**"
+        - "/front/**"
+        - "/**/**.js"
+        - "/**/**.css"
+        - "/**/index.html"
+        - "/**/index.html"
     # 报警功能
     alarm:
       # 这里的 {xxxxxx} 替换成你的钉钉机器人的 secret

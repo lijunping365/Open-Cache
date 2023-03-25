@@ -149,53 +149,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.yml</include>
-                    <include>**/*.yaml</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.tld</include>
-                    <include>**/*.p12</include>
-                    <include>**/*.conf</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.wsdl</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.ftl</include>
-                    <include>**/*.lua</include>
-                    <include>**/*.json</include>
-                    <include>processes/*</include>
-                    <include>**/spring.factories</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.tld</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/view</directory>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-
-            <resource>
-                <directory>src/main/proto</directory>
-                <includes>
-                    <include>**/*.proto</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
 </project>
