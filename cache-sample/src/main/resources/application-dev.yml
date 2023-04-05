@@ -24,11 +24,11 @@ com:
     rpc:
       server:
         server-address: 127.0.0.1
-        server-port: 5200
+        server-port: 5400
         server-name: open-cache-app
     cache:
       namespace: open-cache-app # 当多个应用使用同一个 redis 时为了区分相同 cacheName
-      instance-id: 127.0.0.1:8080 # 可以为服务器 ip：应用端口
+      instance-id: 127.0.0.1:8020 # 可以为服务器 ip：应用端口
 
 
 
