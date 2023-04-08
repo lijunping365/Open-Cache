@@ -12,7 +12,7 @@ public class BaseException extends RuntimeException {
   /**
    * 错误码
    */
-  private Integer code = 500;
+  private Integer code = 1000;
 
   public BaseException(String msg) {
     super(msg);
