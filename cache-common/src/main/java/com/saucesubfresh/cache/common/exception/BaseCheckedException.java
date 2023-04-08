@@ -11,7 +11,7 @@ public class BaseCheckedException extends Exception {
   /**
    * 错误码
    */
-  private Integer code = 500;
+  private Integer code = 1000;
 
   public BaseCheckedException(String message) {
     super(message);
