@@ -46,6 +46,11 @@ public enum CacheCommandEnum {
      * Query cacheKeySet
      */
     QUERY_CACHE_KEY_SET("query_cache_key_set"),
+
+    /**
+     * Query nodeMetrics
+     */
+    QUERY_NODE_METRICS("query_node_metrics"),
     ;
 
     private final String value;
