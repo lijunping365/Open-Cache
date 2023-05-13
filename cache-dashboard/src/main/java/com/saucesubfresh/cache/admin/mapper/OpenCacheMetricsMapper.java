@@ -25,7 +25,11 @@ public interface OpenCacheMetricsMapper extends BaseMapper<OpenCacheMetricsDO> {
         );
     }
 
-    default List<OpenCacheMetricsDO> queryList(){
-        return selectList(Wrappers.lambdaQuery());
+    default List<OpenCacheMetricsDO> queryList(Long appId, Integer count){
+        return selectList(Wrappers.<OpenCacheMetricsDO>lambdaQuery()
+                .eq(OpenCacheMetricsDO::getAppId, appId)
+                .orderByDesc(OpenCacheMetricsDO::getCreateTime)
+                .last("limit " + count)
+        );
     }
 }

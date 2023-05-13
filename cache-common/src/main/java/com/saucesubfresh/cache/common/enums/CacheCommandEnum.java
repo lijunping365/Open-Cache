@@ -51,6 +51,11 @@ public enum CacheCommandEnum {
      * Query nodeMetrics
      */
     QUERY_NODE_METRICS("query_node_metrics"),
+
+    /**
+     * Query cacheNames count
+     */
+    QUERY_CACHE_NAMES_COUNT("query_cache_names_count"),
     ;
 
     private final String value;

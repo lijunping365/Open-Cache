@@ -103,6 +103,10 @@ public class CacheMessageProcessor implements MessageProcess {
                     SystemMetricsInfo systemMetricsInfo = getNodeMetrics();
                     response.setData(JSON.toJSON(systemMetricsInfo));
                     break;
+                case QUERY_CACHE_NAMES_COUNT:
+                    int cacheNameCount = getCacheNameCount();
+                    response.setData(String.valueOf(cacheNameCount));
+                    break;
                 default:
                     throw new UnsupportedOperationException("Unsupported Operation");
             }
@@ -219,6 +223,12 @@ public class CacheMessageProcessor implements MessageProcess {
         pageInfo.setCacheNames(cacheNameInfos);
         return pageInfo;
 
+    }
+
+    private int getCacheNameCount(){
+        Map<String, CacheConfig> cacheConfigMap = configFactory.getCacheConfig();
+        Collection<String> cacheNames = cacheConfigMap.keySet();
+        return cacheNames.size();
     }
 
     private CacheStatsInfo getCacheMetrics(String cacheName){
