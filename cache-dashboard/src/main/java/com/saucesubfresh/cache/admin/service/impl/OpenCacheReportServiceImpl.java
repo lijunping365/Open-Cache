@@ -1,5 +1,6 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
@@ -12,6 +13,7 @@ import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
+import com.saucesubfresh.cache.common.time.LocalDateTimeUtil;
 import com.saucesubfresh.rpc.client.cluster.ClusterInvoker;
 import com.saucesubfresh.rpc.client.store.InstanceStore;
 import com.saucesubfresh.rpc.core.Message;
@@ -23,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +50,19 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         this.clusterInvoker = clusterInvoker;
         this.cacheAppMapper = cacheAppMapper;
         this.metricsMapper = metricsMapper;
+    }
+
+    @Override
+    public void generateReport(LocalDateTime now) {
+        List<OpenCacheAppDO> openCacheAppDOS = cacheAppMapper.selectList(Wrappers.lambdaQuery());
+        if (CollectionUtils.isEmpty(openCacheAppDOS)){
+            return;
+        }
+        LocalDateTime startTime = LocalDateTimeUtil.getDayStart(now);
+        LocalDateTime endTime = LocalDateTimeUtil.getDayEnd(now);
+        for (OpenCacheAppDO appDO : openCacheAppDOS) {
+
+        }
     }
 
     @Override
@@ -88,6 +104,17 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
             openJobChartRespDTO.setHitCount(e.getHitCount());
             return openJobChartRespDTO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count) {
+        List<OpenCacheMetricsDO> openCacheMetricsDOS = metricsMapper.queryList(appId, instanceId, null, count);
+        if (CollectionUtils.isEmpty(openCacheMetricsDOS)){
+            return Collections.emptyList();
+        }
+
+
+        return null;
     }
 
     private MessageResponseBody doInvoke(Message message){

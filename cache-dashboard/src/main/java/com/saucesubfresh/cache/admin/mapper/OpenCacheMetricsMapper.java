@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO;
 import com.saucesubfresh.cache.api.dto.req.OpenCacheMetricsReqDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,9 +26,11 @@ public interface OpenCacheMetricsMapper extends BaseMapper<OpenCacheMetricsDO> {
         );
     }
 
-    default List<OpenCacheMetricsDO> queryList(Long appId, Integer count){
+    default List<OpenCacheMetricsDO> queryList(Long appId, String instanceId, String cacheName, Integer count){
         return selectList(Wrappers.<OpenCacheMetricsDO>lambdaQuery()
                 .eq(OpenCacheMetricsDO::getAppId, appId)
+                .eq(StringUtils.isNotBlank(instanceId), OpenCacheMetricsDO::getInstanceId, instanceId)
+                .eq(StringUtils.isNotBlank(cacheName), OpenCacheMetricsDO::getCacheName, cacheName)
                 .orderByDesc(OpenCacheMetricsDO::getCreateTime)
                 .last("limit " + count)
         );
