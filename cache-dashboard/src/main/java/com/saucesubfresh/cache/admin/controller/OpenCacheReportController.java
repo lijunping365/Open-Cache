@@ -3,6 +3,7 @@ package com.saucesubfresh.cache.admin.controller;
 import com.saucesubfresh.cache.admin.service.OpenCacheReportService;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheChartRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenTopKRespDTO;
 import com.saucesubfresh.cache.common.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +32,25 @@ public class OpenCacheReportController {
 
     @GetMapping("/chart")
     public Result<List<OpenCacheChartRespDTO>> getChart(@RequestParam(value = "appId") Long appId,
+                                                        @RequestParam(value = "cacheName", required = false) String cacheName,
+                                                        @RequestParam(value = "instanceId", required = false) String instanceId,
                                                         @RequestParam(value = "count", required = false, defaultValue = "30") Integer count) {
-        return Result.succeed(cacheReportService.getAppChart(appId, count));
+        return Result.succeed(cacheReportService.getChart(appId, cacheName, instanceId, count));
+    }
+
+    @GetMapping("/cacheNameTok")
+    public Result<List<OpenTopKRespDTO>> getCacheNameTopK(@RequestParam(value = "appId") Long appId,
+                                                          @RequestParam(value = "instanceId", required = false) String instanceId,
+                                                          @RequestParam(value = "count", required = false, defaultValue = "30") Integer count,
+                                                          @RequestParam(value = "top", required = false, defaultValue = "10") Integer top) {
+        return Result.succeed(cacheReportService.getCacheNameTopK(appId, instanceId, count, top));
+    }
+
+    @GetMapping("/instanceTok")
+    public Result<List<OpenTopKRespDTO>> getInstanceTopK(@RequestParam(value = "appId") Long appId,
+                                                         @RequestParam(value = "cacheName", required = false) String cacheName,
+                                                         @RequestParam(value = "count", required = false, defaultValue = "30") Integer count,
+                                                         @RequestParam(value = "top", required = false, defaultValue = "10") Integer top) {
+        return Result.succeed(cacheReportService.getInstanceTopK(appId, cacheName, count, top));
     }
 }
