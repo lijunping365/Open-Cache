@@ -15,9 +15,17 @@ public interface OpenCacheReportService {
 
     OpenCacheStatisticRespDTO getStatistic(Long appId);
 
-    List<OpenCacheChartRespDTO> getAppChart(Long appId, Integer count);
+    default List<OpenCacheChartRespDTO> getAppChart(Long appId, Integer count){
+        return getChart(appId, null, null, count);
+    }
 
-    List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count);
+    default List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count){
+        return getChart(appId, null, instanceId, count);
+    }
 
-    List<OpenCacheChartRespDTO> getCacheNameChart(Long appId, String cacheName, Integer count);
+    default List<OpenCacheChartRespDTO> getCacheNameChart(Long appId, String cacheName, Integer count){
+        return getChart(appId, cacheName, null, count);
+    }
+
+    List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count);
 }

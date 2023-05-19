@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -139,41 +137,28 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     }
 
     @Override
-    public List<OpenCacheChartRespDTO> getAppChart(Long appId, Integer count) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, null, count);
-        if (CollectionUtils.isEmpty(openCacheReportDOS)){
-            return Collections.emptyList();
-        }
-//        return openCacheReportDOS.stream().map(e->{
-//            OpenCacheChartRespDTO openJobChartRespDTO = new OpenCacheChartRespDTO();
-//            openJobChartRespDTO.setDate(e.getCreateTime().toLocalDate());
-//            openJobChartRespDTO.setHitCount(e.getRequestCount());
-//            openJobChartRespDTO.setHitCount(e.getHitCount());
-//            return openJobChartRespDTO;
-//        }).collect(Collectors.toList());
-        return null;
-    }
-
-    @Override
-    public List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, count);
+    public List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, count);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
 
+        Map<LocalDateTime, List<OpenCacheReportDO>> groupByDateMap = openCacheReportDOS.stream().collect(Collectors.groupingBy(
+                OpenCacheReportDO::getCreateTime
+        ));
 
-        return null;
-    }
+        List<OpenCacheChartRespDTO> chartRespDTOS = new ArrayList<>();
+        groupByDateMap.forEach((k, v) ->{
+            Long totalRequestCount = v.stream().map(OpenCacheReportDO::getTotalRequestCount).reduce(Long::sum).orElse(0L);
+            Long totalHitCount = v.stream().map(OpenCacheReportDO::getTotalHitCount).reduce(Long::sum).orElse(0L);
+            OpenCacheChartRespDTO openCacheChartRespDTO = new OpenCacheChartRespDTO();
+            openCacheChartRespDTO.setDate(k.toLocalDate());
+            openCacheChartRespDTO.setRequestCount(totalRequestCount);
+            openCacheChartRespDTO.setHitCount(totalHitCount);
+            chartRespDTOS.add(openCacheChartRespDTO);
+        });
 
-    @Override
-    public List<OpenCacheChartRespDTO> getCacheNameChart(Long appId, String cacheName, Integer count) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, count);
-        if (CollectionUtils.isEmpty(openCacheReportDOS)){
-            return Collections.emptyList();
-        }
-
-
-        return null;
+        return chartRespDTOS;
     }
 
     private MessageResponseBody doInvoke(Message message){
