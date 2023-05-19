@@ -18,7 +18,6 @@ public interface OpenCacheReportService {
 
     List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count);
 
-
     default List<OpenTopKRespDTO> getCacheNameTopK(Long appId, String instanceId, Integer count, Integer top){
         return getTopK(appId, null, instanceId, "cacheName", count, top);
     }
