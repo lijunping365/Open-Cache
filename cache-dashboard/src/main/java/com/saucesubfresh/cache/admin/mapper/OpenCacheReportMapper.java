@@ -19,6 +19,7 @@ public interface OpenCacheReportMapper extends BaseMapper<OpenCacheReportDO> {
                 .eq(OpenCacheReportDO::getAppId, appId)
                 .eq(StringUtils.isNotBlank(cacheName), OpenCacheReportDO::getCacheName, cacheName)
                 .eq(StringUtils.isNotBlank(instanceId), OpenCacheReportDO::getInstanceId, instanceId)
+                .orderByDesc(OpenCacheReportDO::getCreateTime)
                 .last("limit " + count)
         );
     }

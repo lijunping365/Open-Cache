@@ -8,6 +8,7 @@ import com.saucesubfresh.cache.admin.mapper.OpenCacheMetricsMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheReportMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheReportService;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheChartRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenTopKRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
@@ -159,6 +160,39 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         });
 
         return chartRespDTOS;
+    }
+
+    @Override
+    public List<OpenTopKRespDTO> getTopK(Long appId, String cacheName, String instanceId, String type, Integer count, Integer top) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, count);
+        if (CollectionUtils.isEmpty(openCacheReportDOS)){
+            return Collections.emptyList();
+        }
+
+        Map<String, List<OpenCacheReportDO>> groupMap = openCacheReportDOS.stream().collect(Collectors.groupingBy(
+                (t) -> type
+        ));
+
+        List<OpenTopKRespDTO> topKRespDTOS = new ArrayList<>();
+        groupMap.forEach((k, v) ->{
+            Long totalRequestCount = v.stream().map(OpenCacheReportDO::getTotalRequestCount).reduce(Long::sum).orElse(0L);
+            Long totalHitCount = v.stream().map(OpenCacheReportDO::getTotalHitCount).reduce(Long::sum).orElse(0L);
+            OpenTopKRespDTO openTopKRespDTO = new OpenTopKRespDTO();
+            openTopKRespDTO.setKey(k);
+            openTopKRespDTO.setRequestCount(totalRequestCount);
+            openTopKRespDTO.setHitCount(totalHitCount);
+            topKRespDTOS.add(openTopKRespDTO);
+        });
+
+        List<OpenTopKRespDTO> collect = topKRespDTOS
+                .stream()
+                .sorted(Comparator.comparing(OpenTopKRespDTO::getRequestCount).reversed())
+                .collect(Collectors.toList());
+
+        if (collect.size() > top){
+            return collect.subList(0, top);
+        }
+        return topKRespDTOS;
     }
 
     private MessageResponseBody doInvoke(Message message){
