@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.saucesubfresh.cache.admin.mapper.OpenCacheMetricsMapper">
+
+    <select id="groupByAppId" resultType="com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO">
+        select app_id as appId from open_cache_metrics
+        where
+            create_time between #{startTime} and #{endTime}
+        group by app_id
+    </select>
+
+    <select id="groupByCacheName" resultType="com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO">
+        select cache_name as cacheName from open_cache_metrics
+        where
+            app_id = #{appId}
+            and create_time between #{startTime} and #{endTime}
+        group by cache_name
+    </select>
+
+    <select id="groupByInstanceId" resultType="com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO">
+        select instance_id as instanceId from open_cache_metrics
+        where
+            app_id = #{appId}
+            and cache_name = #{cacheName}
+            and create_time between #{startTime} and #{endTime}
+        group by instance_id
+    </select>
+</mapper>

@@ -32,6 +32,6 @@ public class OpenCacheReportController {
     @GetMapping("/chart")
     public Result<List<OpenCacheChartRespDTO>> getChart(@RequestParam(value = "appId") Long appId,
                                                         @RequestParam(value = "count", required = false, defaultValue = "30") Integer count) {
-        return Result.succeed(cacheReportService.getChart(appId, count));
+        return Result.succeed(cacheReportService.getAppChart(appId, count));
     }
 }

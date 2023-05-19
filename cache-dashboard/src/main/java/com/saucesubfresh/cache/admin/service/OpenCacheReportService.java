@@ -15,7 +15,9 @@ public interface OpenCacheReportService {
 
     OpenCacheStatisticRespDTO getStatistic(Long appId);
 
-    List<OpenCacheChartRespDTO> getChart(Long appId, Integer count);
+    List<OpenCacheChartRespDTO> getAppChart(Long appId, Integer count);
 
     List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count);
+
+    List<OpenCacheChartRespDTO> getCacheNameChart(Long appId, String cacheName, Integer count);
 }

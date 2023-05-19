@@ -40,6 +40,6 @@ public class SystemTask {
         LocalDateTime yesterday = now.plusDays(-1);
         LocalDateTime time = LocalDateTimeUtil.getDayEnd(yesterday);
         openCacheReportService.generateReport(yesterday);
-        openCacheMetricsMapper.clearLog(time, interval);
+        openCacheMetricsMapper.clearMetrics(time, interval);
     }
 }

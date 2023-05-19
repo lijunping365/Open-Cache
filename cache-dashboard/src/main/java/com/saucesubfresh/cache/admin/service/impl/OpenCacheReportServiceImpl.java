@@ -1,10 +1,11 @@
 package com.saucesubfresh.cache.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.saucesubfresh.cache.admin.entity.OpenCacheAppDO;
 import com.saucesubfresh.cache.admin.entity.OpenCacheMetricsDO;
+import com.saucesubfresh.cache.admin.entity.OpenCacheReportDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheMetricsMapper;
+import com.saucesubfresh.cache.admin.mapper.OpenCacheReportMapper;
 import com.saucesubfresh.cache.admin.service.OpenCacheReportService;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheChartRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticRespDTO;
@@ -42,26 +43,72 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     private final OpenCacheAppMapper cacheAppMapper;
     private final OpenCacheMetricsMapper metricsMapper;
 
+    private final OpenCacheReportMapper cacheReportMapper;
+
     public OpenCacheReportServiceImpl(InstanceStore instanceStore,
                                       ClusterInvoker clusterInvoker,
                                       OpenCacheAppMapper cacheAppMapper,
-                                      OpenCacheMetricsMapper metricsMapper) {
+                                      OpenCacheMetricsMapper metricsMapper,
+                                      OpenCacheReportMapper cacheReportMapper) {
         this.instanceStore = instanceStore;
         this.clusterInvoker = clusterInvoker;
         this.cacheAppMapper = cacheAppMapper;
         this.metricsMapper = metricsMapper;
+        this.cacheReportMapper = cacheReportMapper;
     }
 
     @Override
     public void generateReport(LocalDateTime now) {
-        List<OpenCacheAppDO> openCacheAppDOS = cacheAppMapper.selectList(Wrappers.lambdaQuery());
-        if (CollectionUtils.isEmpty(openCacheAppDOS)){
-            return;
-        }
         LocalDateTime startTime = LocalDateTimeUtil.getDayStart(now);
         LocalDateTime endTime = LocalDateTimeUtil.getDayEnd(now);
-        for (OpenCacheAppDO appDO : openCacheAppDOS) {
 
+        List<OpenCacheMetricsDO> cacheMetricsByAppId = metricsMapper.groupByAppId(startTime, endTime);
+        if (CollectionUtils.isEmpty(cacheMetricsByAppId)){
+            return;
+        }
+
+        for (OpenCacheMetricsDO cacheMetricByAppId : cacheMetricsByAppId) {
+            List<OpenCacheMetricsDO> cacheMetricsByCacheName = metricsMapper
+                    .groupByCacheName(
+                            cacheMetricByAppId.getAppId(),
+                            startTime,
+                            endTime
+                    );
+            for (OpenCacheMetricsDO cacheMetricByCacheName : cacheMetricsByCacheName) {
+                List<OpenCacheMetricsDO> cacheMetricsByInstanceId = metricsMapper
+                        .groupByInstanceId(
+                                cacheMetricByAppId.getAppId(),
+                                cacheMetricByCacheName.getCacheName(),
+                                startTime,
+                                endTime
+                        );
+                for (OpenCacheMetricsDO cacheMetricByInstanceId : cacheMetricsByInstanceId) {
+                    List<OpenCacheMetricsDO> cacheMetricsDOS = metricsMapper.queryList(
+                            cacheMetricByAppId.getAppId(),
+                            cacheMetricByCacheName.getCacheName(),
+                            cacheMetricByInstanceId.getInstanceId(),
+                            startTime,
+                            endTime
+                    );
+
+                    Long totalRequestCount = cacheMetricsDOS.stream()
+                            .map(OpenCacheMetricsDO::getRequestCount)
+                            .reduce(Long::sum).orElse(0L);
+
+                    Long totalHitCount = cacheMetricsDOS.stream()
+                            .map(OpenCacheMetricsDO::getHitCount)
+                            .reduce(Long::sum).orElse(0L);
+
+                    OpenCacheReportDO openCacheReportDO = new OpenCacheReportDO();
+                    openCacheReportDO.setAppId(cacheMetricByAppId.getAppId());
+                    openCacheReportDO.setCacheName(cacheMetricByCacheName.getCacheName());
+                    openCacheReportDO.setInstanceId(cacheMetricByInstanceId.getInstanceId());
+                    openCacheReportDO.setTotalRequestCount(totalRequestCount);
+                    openCacheReportDO.setTotalHitCount(totalHitCount);
+                    openCacheReportDO.setCreateTime(endTime);
+                    cacheReportMapper.insert(openCacheReportDO);
+                }
+            }
         }
     }
 
@@ -92,24 +139,36 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     }
 
     @Override
-    public List<OpenCacheChartRespDTO> getChart(Long appId, Integer count) {
-        List<OpenCacheMetricsDO> openJobReportDOS = metricsMapper.queryList(appId, count);
-        if (CollectionUtils.isEmpty(openJobReportDOS)){
+    public List<OpenCacheChartRespDTO> getAppChart(Long appId, Integer count) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, null, count);
+        if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
-        return openJobReportDOS.stream().map(e->{
-            OpenCacheChartRespDTO openJobChartRespDTO = new OpenCacheChartRespDTO();
-            openJobChartRespDTO.setDate(e.getCreateTime().toLocalDate());
-            openJobChartRespDTO.setHitCount(e.getRequestCount());
-            openJobChartRespDTO.setHitCount(e.getHitCount());
-            return openJobChartRespDTO;
-        }).collect(Collectors.toList());
+//        return openCacheReportDOS.stream().map(e->{
+//            OpenCacheChartRespDTO openJobChartRespDTO = new OpenCacheChartRespDTO();
+//            openJobChartRespDTO.setDate(e.getCreateTime().toLocalDate());
+//            openJobChartRespDTO.setHitCount(e.getRequestCount());
+//            openJobChartRespDTO.setHitCount(e.getHitCount());
+//            return openJobChartRespDTO;
+//        }).collect(Collectors.toList());
+        return null;
     }
 
     @Override
     public List<OpenCacheChartRespDTO> getInstanceChart(Long appId, String instanceId, Integer count) {
-        List<OpenCacheMetricsDO> openCacheMetricsDOS = metricsMapper.queryList(appId, instanceId, null, count);
-        if (CollectionUtils.isEmpty(openCacheMetricsDOS)){
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, count);
+        if (CollectionUtils.isEmpty(openCacheReportDOS)){
+            return Collections.emptyList();
+        }
+
+
+        return null;
+    }
+
+    @Override
+    public List<OpenCacheChartRespDTO> getCacheNameChart(Long appId, String cacheName, Integer count) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, count);
+        if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
 
