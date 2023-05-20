@@ -163,36 +163,31 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     }
 
     @Override
-    public List<OpenTopKRespDTO> getTopK(Long appId, String cacheName, String instanceId, String type, Integer count, Integer top) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, count);
+    public List<OpenTopKRespDTO> getCacheNameTopK(Long appId, String instanceId, Integer count, Integer top) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, count);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
 
         Map<String, List<OpenCacheReportDO>> groupMap = openCacheReportDOS.stream().collect(Collectors.groupingBy(
-                (t) -> type
+                OpenCacheReportDO::getCacheName
         ));
 
-        List<OpenTopKRespDTO> topKRespDTOS = new ArrayList<>();
-        groupMap.forEach((k, v) ->{
-            Long totalRequestCount = v.stream().map(OpenCacheReportDO::getTotalRequestCount).reduce(Long::sum).orElse(0L);
-            Long totalHitCount = v.stream().map(OpenCacheReportDO::getTotalHitCount).reduce(Long::sum).orElse(0L);
-            OpenTopKRespDTO openTopKRespDTO = new OpenTopKRespDTO();
-            openTopKRespDTO.setKey(k);
-            openTopKRespDTO.setRequestCount(totalRequestCount);
-            openTopKRespDTO.setHitCount(totalHitCount);
-            topKRespDTOS.add(openTopKRespDTO);
-        });
+        return getTopK(groupMap, top);
+    }
 
-        List<OpenTopKRespDTO> collect = topKRespDTOS
-                .stream()
-                .sorted(Comparator.comparing(OpenTopKRespDTO::getRequestCount).reversed())
-                .collect(Collectors.toList());
-
-        if (collect.size() > top){
-            return collect.subList(0, top);
+    @Override
+    public List<OpenTopKRespDTO> getInstanceTopK(Long appId, String cacheName, Integer count, Integer top) {
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, count);
+        if (CollectionUtils.isEmpty(openCacheReportDOS)){
+            return Collections.emptyList();
         }
-        return topKRespDTOS;
+
+        Map<String, List<OpenCacheReportDO>> groupMap = openCacheReportDOS.stream().collect(Collectors.groupingBy(
+                OpenCacheReportDO::getInstanceId
+        ));
+
+        return getTopK(groupMap, top);
     }
 
     private MessageResponseBody doInvoke(Message message){
@@ -206,6 +201,28 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
             throw new RpcException("处理失败");
         }
         return response;
+    }
+
+    public List<OpenTopKRespDTO> getTopK(Map<String, List<OpenCacheReportDO>> groupMap, Integer top) {
+        List<OpenTopKRespDTO> topKRespDTOS = new ArrayList<>();
+        for (Map.Entry<String, List<OpenCacheReportDO>> entry : groupMap.entrySet()) {
+            List<OpenCacheReportDO> value = entry.getValue();
+            Long totalRequestCount = value.stream().map(OpenCacheReportDO::getTotalRequestCount).reduce(Long::sum).orElse(0L);
+            Long totalHitCount = value.stream().map(OpenCacheReportDO::getTotalHitCount).reduce(Long::sum).orElse(0L);
+            OpenTopKRespDTO openTopKRespDTO = new OpenTopKRespDTO();
+            openTopKRespDTO.setKey(entry.getKey());
+            openTopKRespDTO.setRequestCount(totalRequestCount);
+            openTopKRespDTO.setHitCount(totalHitCount);
+            topKRespDTOS.add(openTopKRespDTO);
+        };
+
+        if (topKRespDTOS.size() > top){
+            topKRespDTOS = topKRespDTOS.subList(0, top);
+        }
+
+        topKRespDTOS.sort((u1, u2) -> u2.getRequestCount().compareTo(u1.getRequestCount()));
+
+        return topKRespDTOS;
     }
 
 }
