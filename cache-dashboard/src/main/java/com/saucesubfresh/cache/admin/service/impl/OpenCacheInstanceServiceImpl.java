@@ -8,7 +8,6 @@ import com.saucesubfresh.cache.api.dto.resp.OpenCacheInstanceRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
 import com.saucesubfresh.cache.common.domain.CacheMessageResponse;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
-import com.saucesubfresh.cache.common.exception.ServiceException;
 import com.saucesubfresh.cache.common.json.JSON;
 import com.saucesubfresh.cache.common.metrics.SystemMetricsInfo;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
@@ -22,22 +21,21 @@ import com.saucesubfresh.rpc.core.enums.ResponseStatus;
 import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.core.information.ServerInformation;
 import com.saucesubfresh.rpc.core.transport.MessageResponseBody;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author: 李俊平
  * @Date: 2022-02-26 15:06
  */
+@Slf4j
 @Service
 public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
 
@@ -92,31 +90,33 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
         }
 
         for (OpenCacheInstanceRespDTO instance : respDTOS) {
-            Message message = new Message();
-            CacheMessageRequest messageBody = new CacheMessageRequest();
-            messageBody.setCommand(CacheCommandEnum.QUERY_NODE_METRICS.getValue());
-            message.setBody(SerializationUtils.serialize(messageBody));
-            String[] serverIdArray = instance.getServerId().split(CommonConstant.Symbol.MH);
-            ServerInformation serverInformation = new ServerInformation(serverIdArray[0], Integer.parseInt(serverIdArray[1]));
-
-            MessageResponseBody messageResponseBody;
-            try {
-                messageResponseBody = doInvoke(message, serverInformation);
-            }catch (RpcException ex){
-                throw new ServiceException(ex.getMessage());
-            }
-
-            byte[] body = messageResponseBody.getBody();
-            CacheMessageResponse response = SerializationUtils.deserialize(body, CacheMessageResponse.class);
-            if (StringUtils.isBlank(response.getData())){
-                continue;
-            }
-
-            SystemMetricsInfo metricsInfo = JSON.parse(response.getData(), SystemMetricsInfo.class);
-            wrapperMetricsInfo(instance, metricsInfo);
+            doWrapper(instance);
         }
 
         return PageResult.build(cacheInstance, cacheInstance.size(), instanceReqDTO.getCurrent(), instanceReqDTO.getPageSize());
+    }
+
+    @Override
+    public OpenCacheInstanceRespDTO getInstanceById(Long appId, String serverId) {
+        OpenCacheAppRespDTO openCacheApp = openCacheAppService.getById(appId);
+        List<ServerInformation> instances = instanceStore.getByNamespace(openCacheApp.getAppName());
+        if (CollectionUtils.isEmpty(instances)){
+            return null;
+        }
+
+        ServerInformation serverInformation = instances.stream()
+                .filter(e -> StringUtils.equals(e.getServerId(), serverId))
+                .findFirst()
+                .orElse(null);
+
+        if (Objects.isNull(serverInformation)){
+            return null;
+        }
+
+        List<OpenCacheInstanceRespDTO> openJobInstanceRespDTOS = convertList(Collections.singletonList(serverInformation));
+        OpenCacheInstanceRespDTO openJobInstanceRespDTO = openJobInstanceRespDTOS.get(0);
+        doWrapper(openJobInstanceRespDTO);
+        return openJobInstanceRespDTO;
     }
 
     @Override
@@ -155,6 +155,32 @@ public class OpenCacheInstanceServiceImpl implements OpenCacheInstanceService {
             instance.setWeight(e.getWeight());
             return instance;
         }).collect(Collectors.toList());
+    }
+
+    private void doWrapper(OpenCacheInstanceRespDTO instance){
+        Message message = new Message();
+        CacheMessageRequest messageBody = new CacheMessageRequest();
+        messageBody.setCommand(CacheCommandEnum.QUERY_NODE_METRICS.getValue());
+        message.setBody(SerializationUtils.serialize(messageBody));
+        String[] serverIdArray = instance.getServerId().split(CommonConstant.Symbol.MH);
+        ServerInformation serverInformation = new ServerInformation(serverIdArray[0], Integer.parseInt(serverIdArray[1]));
+
+        MessageResponseBody messageResponseBody;
+        try {
+            messageResponseBody = doInvoke(message, serverInformation);
+        }catch (RpcException ex){
+            log.error(ex.getMessage(), ex);
+            return;
+        }
+
+        byte[] body = messageResponseBody.getBody();
+        CacheMessageResponse response = SerializationUtils.deserialize(body, CacheMessageResponse.class);
+        if (StringUtils.isBlank(response.getData())){
+            return;
+        }
+
+        SystemMetricsInfo metricsInfo = JSON.parse(response.getData(), SystemMetricsInfo.class);
+        wrapperMetricsInfo(instance, metricsInfo);
     }
 
     private void wrapperMetricsInfo(OpenCacheInstanceRespDTO instance, SystemMetricsInfo metricsInfo){

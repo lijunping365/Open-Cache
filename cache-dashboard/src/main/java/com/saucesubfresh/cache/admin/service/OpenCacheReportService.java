@@ -14,7 +14,13 @@ public interface OpenCacheReportService {
 
     void generateReport(LocalDateTime now);
 
-    OpenCacheStatisticRespDTO getStatistic(Long appId);
+    OpenCacheStatisticRespDTO getStatistic();
+
+    OpenCacheStatisticRespDTO getAppStatistic(Long appId);
+
+    OpenCacheStatisticRespDTO getCacheNameStatistic(Long appId, String cacheName);
+
+    OpenCacheStatisticRespDTO getInstanceStatistic(Long appId, String serverId);
 
     List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count);
 

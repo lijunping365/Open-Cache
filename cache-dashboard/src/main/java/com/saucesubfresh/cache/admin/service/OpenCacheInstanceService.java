@@ -14,5 +14,7 @@ public interface OpenCacheInstanceService {
     
     PageResult<OpenCacheInstanceRespDTO> selectPage(OpenCacheInstanceReqDTO instanceReqDTO);
 
+    OpenCacheInstanceRespDTO getInstanceById(Long appId, String serverId);
+
     List<OpenCacheInstanceRespDTO> getInstanceList(Long appId);
 }

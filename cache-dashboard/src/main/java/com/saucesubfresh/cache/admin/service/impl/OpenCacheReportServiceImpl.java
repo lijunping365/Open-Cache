@@ -6,8 +6,10 @@ import com.saucesubfresh.cache.admin.entity.OpenCacheReportDO;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheAppMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheMetricsMapper;
 import com.saucesubfresh.cache.admin.mapper.OpenCacheReportMapper;
+import com.saucesubfresh.cache.admin.service.OpenCacheInstanceService;
 import com.saucesubfresh.cache.admin.service.OpenCacheReportService;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheChartRespDTO;
+import com.saucesubfresh.cache.api.dto.resp.OpenCacheInstanceRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenTopKRespDTO;
 import com.saucesubfresh.cache.api.dto.resp.OpenCacheStatisticRespDTO;
 import com.saucesubfresh.cache.common.domain.CacheMessageRequest;
@@ -41,19 +43,21 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     private final ClusterInvoker clusterInvoker;
     private final OpenCacheAppMapper cacheAppMapper;
     private final OpenCacheMetricsMapper metricsMapper;
-
     private final OpenCacheReportMapper cacheReportMapper;
+    private final OpenCacheInstanceService openCacheInstanceService;
 
     public OpenCacheReportServiceImpl(InstanceStore instanceStore,
                                       ClusterInvoker clusterInvoker,
                                       OpenCacheAppMapper cacheAppMapper,
                                       OpenCacheMetricsMapper metricsMapper,
-                                      OpenCacheReportMapper cacheReportMapper) {
+                                      OpenCacheReportMapper cacheReportMapper,
+                                      OpenCacheInstanceService openCacheInstanceService) {
         this.instanceStore = instanceStore;
         this.clusterInvoker = clusterInvoker;
         this.cacheAppMapper = cacheAppMapper;
         this.metricsMapper = metricsMapper;
         this.cacheReportMapper = cacheReportMapper;
+        this.openCacheInstanceService = openCacheInstanceService;
     }
 
     @Override
@@ -112,7 +116,29 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
     }
 
     @Override
-    public OpenCacheStatisticRespDTO getStatistic(Long appId) {
+    public OpenCacheStatisticRespDTO getStatistic() {
+        List<OpenCacheAppDO> openCacheAppDOS = cacheAppMapper.queryList(null);
+        if (CollectionUtils.isEmpty(openCacheAppDOS)){
+            return null;
+        }
+
+        int nodeCount = 0;
+        int cacheNameCount = 0;
+        for (OpenCacheAppDO openCacheAppDO : openCacheAppDOS) {
+            OpenCacheStatisticRespDTO appStatistic = this.getAppStatistic(openCacheAppDO.getId());
+            nodeCount += appStatistic.getNodeCount();
+            cacheNameCount += appStatistic.getCacheNameCount();
+        }
+
+        return OpenCacheStatisticRespDTO.builder()
+                .appNum(openCacheAppDOS.size())
+                .cacheNameCount(cacheNameCount)
+                .nodeCount(nodeCount)
+                .build();
+    }
+
+    @Override
+    public OpenCacheStatisticRespDTO getAppStatistic(Long appId) {
         OpenCacheStatisticRespDTO respDTO = new OpenCacheStatisticRespDTO();
         OpenCacheAppDO openCacheAppDO = cacheAppMapper.selectById(appId);
         Message message = new Message();
@@ -135,6 +161,40 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         List<ServerInformation> instances = instanceStore.getByNamespace(openCacheAppDO.getAppName());
         respDTO.setNodeCount(instances.size());
         return respDTO;
+    }
+
+    @Override
+    public OpenCacheStatisticRespDTO getCacheNameStatistic(Long appId, String cacheName) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTimeUtil.getDayStart(now);
+        LocalDateTime endTime = LocalDateTimeUtil.getDayEnd(now);
+        List<OpenCacheMetricsDO> metricsDOS = metricsMapper.queryList(appId, cacheName, null, startTime, endTime);
+        if (CollectionUtils.isEmpty(metricsDOS)){
+            return null;
+        }
+
+        Long totalRequestCount = metricsDOS.stream().map(OpenCacheMetricsDO::getRequestCount).reduce(Long::sum).orElse(0L);
+        Long totalHitCount = metricsDOS.stream().map(OpenCacheMetricsDO::getHitCount).reduce(Long::sum).orElse(0L);
+        return OpenCacheStatisticRespDTO.builder()
+                .cacheName(cacheName)
+                .requestCount(totalRequestCount)
+                .hitCount(totalHitCount)
+                .build();
+    }
+
+    @Override
+    public OpenCacheStatisticRespDTO getInstanceStatistic(Long appId, String serverId) {
+        OpenCacheInstanceRespDTO instance = openCacheInstanceService.getInstanceById(appId, serverId);
+        if (Objects.isNull(instance)){
+            return null;
+        }
+
+        return OpenCacheStatisticRespDTO.builder()
+                .liveTime(instance.getLiveTime())
+                .cpuInfo(instance.getCpuInfo())
+                .memoryInfo(instance.getMemoryInfo())
+                .diskInfo(instance.getDiskInfo())
+                .build();
     }
 
     @Override

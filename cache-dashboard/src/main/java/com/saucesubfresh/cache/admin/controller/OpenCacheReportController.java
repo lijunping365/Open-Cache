@@ -26,8 +26,25 @@ public class OpenCacheReportController {
     private OpenCacheReportService cacheReportService;
 
     @GetMapping("/statistic")
-    public Result<OpenCacheStatisticRespDTO> getStatistic(@RequestParam("appId") Long appId) {
-        return Result.succeed(cacheReportService.getStatistic(appId));
+    public Result<OpenCacheStatisticRespDTO> getStatistic() {
+        return Result.succeed(cacheReportService.getStatistic());
+    }
+
+    @GetMapping("/appStatistic")
+    public Result<OpenCacheStatisticRespDTO> getAppStatistic(@RequestParam("appId") Long appId) {
+        return Result.succeed(cacheReportService.getAppStatistic(appId));
+    }
+
+    @GetMapping("/cacheNameStatistic")
+    public Result<OpenCacheStatisticRespDTO> getJobStatistic(@RequestParam("appId") Long appId,
+                                                             @RequestParam("cacheName") String cacheName) {
+        return Result.succeed(cacheReportService.getCacheNameStatistic(appId, cacheName));
+    }
+
+    @GetMapping("/instanceStatistic")
+    public Result<OpenCacheStatisticRespDTO> getInstanceStatistic(@RequestParam("appId") Long appId,
+                                                                  @RequestParam("serverId") String serverId) {
+        return Result.succeed(cacheReportService.getInstanceStatistic(appId, serverId));
     }
 
     @GetMapping("/chart")

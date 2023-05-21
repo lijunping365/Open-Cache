@@ -15,14 +15,45 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OpenCacheStatisticRespDTO implements Serializable {
-
     /**
-     * 任务总数量
+     * 应用数量
+     */
+    private Integer appNum;
+    /**
+     * cacheName 总数量
      */
     private Integer cacheNameCount;
     /**
-     * 任务运行数量
+     * 节点数量
      */
     private Integer nodeCount;
+    /**
+     * 缓存名称
+     */
+    private String cacheName;
+    /**
+     * 总请求总数
+     */
+    private Long requestCount;
+    /**
+     * 总命中总数
+     */
+    private Long hitCount;
+    /**
+     * 运行时长
+     */
+    private String liveTime;
+    /**
+     * cpu使用信息
+     */
+    private String cpuInfo;
+    /**
+     * 内存使用信息
+     */
+    private String memoryInfo;
+    /**
+     * 磁盘使用信息
+     */
+    private String diskInfo;
 
 }
