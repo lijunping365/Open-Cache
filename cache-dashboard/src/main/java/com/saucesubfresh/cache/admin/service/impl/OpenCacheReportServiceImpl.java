@@ -25,6 +25,7 @@ import com.saucesubfresh.rpc.core.enums.ResponseStatus;
 import com.saucesubfresh.rpc.core.exception.RpcException;
 import com.saucesubfresh.rpc.core.information.ServerInformation;
 import com.saucesubfresh.rpc.core.transport.MessageResponseBody;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 /**
  * @author lijunping on 2022/4/11
  */
+@Slf4j
 @Service
 public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
@@ -71,15 +73,13 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         }
 
         for (OpenCacheMetricsDO cacheMetricByAppId : cacheMetricsByAppId) {
-            List<OpenCacheMetricsDO> cacheMetricsByCacheName = metricsMapper
-                    .groupByCacheName(
+            List<OpenCacheMetricsDO> cacheMetricsByCacheName = metricsMapper.groupByCacheName(
                             cacheMetricByAppId.getAppId(),
                             startTime,
                             endTime
                     );
             for (OpenCacheMetricsDO cacheMetricByCacheName : cacheMetricsByCacheName) {
-                List<OpenCacheMetricsDO> cacheMetricsByInstanceId = metricsMapper
-                        .groupByInstanceId(
+                List<OpenCacheMetricsDO> cacheMetricsByInstanceId = metricsMapper.groupByInstanceId(
                                 cacheMetricByAppId.getAppId(),
                                 cacheMetricByCacheName.getCacheName(),
                                 startTime,
@@ -125,9 +125,13 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         int nodeCount = 0;
         int cacheNameCount = 0;
         for (OpenCacheAppDO openCacheAppDO : openCacheAppDOS) {
-            OpenCacheStatisticRespDTO appStatistic = this.getAppStatistic(openCacheAppDO.getId());
-            nodeCount += appStatistic.getNodeCount();
-            cacheNameCount += appStatistic.getCacheNameCount();
+            try {
+                OpenCacheStatisticRespDTO appStatistic = getAppStatistic(openCacheAppDO.getId());
+                nodeCount += appStatistic.getNodeCount();
+                cacheNameCount += appStatistic.getCacheNameCount();
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+            }
         }
 
         return OpenCacheStatisticRespDTO.builder()
