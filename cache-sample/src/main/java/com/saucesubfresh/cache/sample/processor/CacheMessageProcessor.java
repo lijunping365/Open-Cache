@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucesubfresh.cache.common.domain.*;
 import com.saucesubfresh.cache.common.enums.CacheCommandEnum;
 import com.saucesubfresh.cache.common.json.JSON;
+import com.saucesubfresh.cache.common.metrics.SystemMetricsInfo;
+import com.saucesubfresh.cache.common.metrics.SystemMetricsUtils;
 import com.saucesubfresh.cache.common.serialize.SerializationUtils;
 import com.saucesubfresh.rpc.core.Message;
 import com.saucesubfresh.rpc.core.exception.RpcException;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
 
@@ -95,6 +98,14 @@ public class CacheMessageProcessor implements MessageProcess {
                 case QUERY_CACHE_METRICS:
                     CacheStatsInfo cacheMetrics = getCacheMetrics(cacheNames.get(0));
                     response.setData(JSON.toJSON(cacheMetrics));
+                    break;
+                case QUERY_NODE_METRICS:
+                    SystemMetricsInfo systemMetricsInfo = getNodeMetrics();
+                    response.setData(JSON.toJSON(systemMetricsInfo));
+                    break;
+                case QUERY_CACHE_NAMES_COUNT:
+                    int cacheNameCount = getCacheNameCount();
+                    response.setData(String.valueOf(cacheNameCount));
                     break;
                 default:
                     throw new UnsupportedOperationException("Unsupported Operation");
@@ -214,6 +225,12 @@ public class CacheMessageProcessor implements MessageProcess {
 
     }
 
+    private int getCacheNameCount(){
+        Map<String, CacheConfig> cacheConfigMap = configFactory.getCacheConfig();
+        Collection<String> cacheNames = cacheConfigMap.keySet();
+        return cacheNames.size();
+    }
+
     private CacheStatsInfo getCacheMetrics(String cacheName){
         CacheStatsInfo cacheStatsInfo = new CacheStatsInfo();
         final ClusterCache cache = cacheManager.getCache(cacheName);
@@ -225,5 +242,31 @@ public class CacheMessageProcessor implements MessageProcess {
         cacheStatsInfo.setHitRate(stats.hitRate());
         cacheStatsInfo.setMissRate(stats.missRate());
         return cacheStatsInfo;
+    }
+
+    private SystemMetricsInfo getNodeMetrics(){
+        SystemMetricsInfo systemMetricsInfo = new SystemMetricsInfo();
+        int cpuProcessorNum = SystemMetricsUtils.getCPUProcessorNum();
+        double cpuLoadPercent = SystemMetricsUtils.getCPULoadPercent();
+        double jvmUsedMemory = SystemMetricsUtils.getJvmUsedMemory();
+        double jvmMaxMemory = SystemMetricsUtils.getJvmMaxMemory();
+        double jvmMemoryUsage = SystemMetricsUtils.getJvmMemoryUsage(jvmUsedMemory, jvmMaxMemory);
+        long[] diskInfo = SystemMetricsUtils.getDiskInfo();
+        long freeDiskSpace = diskInfo[0];
+        long totalDiskSpace = diskInfo[1];
+        double diskUsed = SystemMetricsUtils.getDiskUsed(totalDiskSpace, freeDiskSpace);
+        double diskTotal = SystemMetricsUtils.getDiskTotal(totalDiskSpace);
+        double diskUsage = SystemMetricsUtils.getDiskUsage(diskUsed, diskTotal);
+
+        systemMetricsInfo.setCpuProcessors(cpuProcessorNum);
+        systemMetricsInfo.setCpuLoad(cpuLoadPercent);
+        systemMetricsInfo.setJvmMaxMemory(jvmMaxMemory);
+        systemMetricsInfo.setJvmUsedMemory(jvmUsedMemory);
+        systemMetricsInfo.setJvmMemoryUsage(jvmMemoryUsage);
+        systemMetricsInfo.setDiskUsed(diskUsed);
+        systemMetricsInfo.setDiskTotal(diskTotal);
+        systemMetricsInfo.setDiskUsage(diskUsage);
+
+        return systemMetricsInfo;
     }
 }

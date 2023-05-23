@@ -1,6 +1,7 @@
 package com.saucesubfresh.cache.api.dto.resp;
 
 import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -20,6 +21,22 @@ public class OpenCacheInstanceRespDTO implements Serializable {
      * 上线时间
      */
     private LocalDateTime onlineTime;
+    /**
+     * 运行时长
+     */
+    private String liveTime;
+    /**
+     * cpu使用信息
+     */
+    private String cpuInfo;
+    /**
+     * 内存使用信息
+     */
+    private String memoryInfo;
+    /**
+     * 磁盘使用信息
+     */
+    private String diskInfo;
     /**
      * 在线状态
      */
