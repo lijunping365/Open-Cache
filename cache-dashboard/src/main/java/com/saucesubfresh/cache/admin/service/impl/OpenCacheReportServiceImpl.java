@@ -173,12 +173,13 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
         LocalDateTime startTime = LocalDateTimeUtil.getDayStart(now);
         LocalDateTime endTime = LocalDateTimeUtil.getDayEnd(now);
         List<OpenCacheMetricsDO> metricsDOS = metricsMapper.queryList(appId, cacheName, null, startTime, endTime);
-        if (CollectionUtils.isEmpty(metricsDOS)){
-            return null;
+        Long totalRequestCount = 0L;
+        Long totalHitCount = 0L;
+        if (!CollectionUtils.isEmpty(metricsDOS)){
+            totalRequestCount = metricsDOS.stream().map(OpenCacheMetricsDO::getRequestCount).reduce(Long::sum).orElse(0L);
+            totalHitCount = metricsDOS.stream().map(OpenCacheMetricsDO::getHitCount).reduce(Long::sum).orElse(0L);
         }
 
-        Long totalRequestCount = metricsDOS.stream().map(OpenCacheMetricsDO::getRequestCount).reduce(Long::sum).orElse(0L);
-        Long totalHitCount = metricsDOS.stream().map(OpenCacheMetricsDO::getHitCount).reduce(Long::sum).orElse(0L);
         return OpenCacheStatisticRespDTO.builder()
                 .cacheName(cacheName)
                 .requestCount(totalRequestCount)
@@ -203,7 +204,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, count);
+        LocalDateTime endTime = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTimeUtil.getDayStart(endTime.plusDays(-count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
@@ -228,7 +231,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenTopKRespDTO> getCacheNameTopK(Long appId, String instanceId, Integer count, Integer top) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, count);
+        LocalDateTime endTime = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTimeUtil.getDayStart(endTime.plusDays(-count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
@@ -242,7 +247,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenTopKRespDTO> getInstanceTopK(Long appId, String cacheName, Integer count, Integer top) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, count);
+        LocalDateTime endTime = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTimeUtil.getDayStart(endTime.plusDays(-count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
