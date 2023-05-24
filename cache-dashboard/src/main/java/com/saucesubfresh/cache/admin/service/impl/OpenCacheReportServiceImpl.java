@@ -203,7 +203,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenCacheChartRespDTO> getChart(Long appId, String cacheName, String instanceId, Integer count) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, count);
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = LocalDateTimeUtil.getDayStart(startTime.plusDays(count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, instanceId, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
@@ -228,7 +230,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenTopKRespDTO> getCacheNameTopK(Long appId, String instanceId, Integer count, Integer top) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, count);
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = LocalDateTimeUtil.getDayStart(startTime.plusDays(count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, null, instanceId, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
@@ -242,7 +246,9 @@ public class OpenCacheReportServiceImpl implements OpenCacheReportService {
 
     @Override
     public List<OpenTopKRespDTO> getInstanceTopK(Long appId, String cacheName, Integer count, Integer top) {
-        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, count);
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = LocalDateTimeUtil.getDayStart(startTime.plusDays(count));
+        List<OpenCacheReportDO> openCacheReportDOS = cacheReportMapper.queryList(appId, cacheName, null, startTime, endTime);
         if (CollectionUtils.isEmpty(openCacheReportDOS)){
             return Collections.emptyList();
         }
